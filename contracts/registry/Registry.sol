@@ -9,59 +9,141 @@ import {IVotingRegistry} from "./IVotingRegistry.sol";
 error AlreadyRegistered(address contractSeekingRegistration);
 error notInterfaceImplementer(address contractSeekingRegistration);
 error InvalidVoteContractSelector(IVoteContract voteContractSelector);
+error NotRegistered(address notRegisteredContract);
 
-abstract contract Registration {
+abstract contract Categories {
 
-    mapping(address=>bool) internal _alreadyRegistered;
-    mapping(bytes4=>IVoteContract) public voteContract;
-    mapping(uint256=>bytes4) public voteContractSelectors;
-    uint256 numberOfRegisteredVoteContracts;
+    bytes4[] internal registeredCategories;
+    mapping(bytes4=>uint256[]) internal registrationsInCategory;
+    mapping(address=>bytes4[]) internal categoriesOfRegistration;
+
+    function getRegisteredCategory(uint256 index) 
+    external 
+    view 
+    returns(bytes4)
+    {
+        return registeredCategories[index];
+    }
+
+    function getNumberOfRegisteredCategories() 
+    external 
+    view 
+    returns(uint256)
+    {
+        return registeredCategories.length;
+    }
+
+
+    function getNumberOfRegistrationsInCategory(bytes4 _category) 
+    external 
+    view 
+    returns(uint256)
+    {
+        return registrationsInCategory[_category].length;
+    }
+
+    function getCategoriesOfRegistration(address registeredContract) 
+    external 
+    view 
+    returns(bytes4[] memory)
+    {
+        return categoriesOfRegistration[registeredContract];
+    }
+
+    function _addCategory(uint256 index, bytes4 _category)
+    internal
+    {
+        if(registrationsInCategory[_category].length==0){
+            registeredCategories.push(_category);
+        }
+        categoriesOfRegistration[msg.sender].push(_category);
+        registrationsInCategory[_category].push(index);
+    }
+
+    function _setCategories(uint256 index, bytes4[] memory _categories)
+    internal
+    {
+        for (uint256 j; j<_categories.length; j++){
+            _addCategory(index, _categories[j]);
+        }
+    }
+
+    function _addCategories(uint256 index, bytes4[] memory _categories)
+    internal
+    {
+        for (uint256 j; j<_categories.length; j++){
+            bool exists = false;
+            for (uint256 i; i<categoriesOfRegistration[msg.sender].length; i++){
+                if (categoriesOfRegistration[msg.sender][i]==_categories[j]) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists){
+                _addCategory(index, _categories[j]);
+            }
+        }
+    }
+    
+}
+
+abstract contract Registration is Categories {
+
+    // mapping(address=>bool) internal _alreadyRegistered;
+    mapping(uint256=>IVoteContract) public voteContract;
+    mapping(address=>uint256) public reverseRegistry;
+    uint256 public numberOfRegisteredVoteContracts;
 
     function _register() 
     internal 
+    returns (uint256)
     {
         numberOfRegisteredVoteContracts += 1;
-        bytes4 selector = _computeId(msg.sender);
-        voteContract[selector] = IVoteContract(msg.sender);
-        voteContractSelectors[numberOfRegisteredVoteContracts] = selector;
+        voteContract[numberOfRegisteredVoteContracts] = IVoteContract(msg.sender);
+        reverseRegistry[msg.sender] = numberOfRegisteredVoteContracts;
+        return numberOfRegisteredVoteContracts;
     }
 
-    function _computeId(address contractSeekingRegistration)
+    function _registerWithCategories(bytes4[] memory _categories) 
     internal 
-    pure 
-    returns(bytes4){
-        return bytes4(keccak256(abi.encode(contractSeekingRegistration)));
+    returns (uint256 index)
+    {        
+        index = _register();
+        _setCategories(index, _categories);
+
+
     }
 
-    function _implementsInterface(address contractSeekingRegistration)
+    function _implementsInterface()
     internal 
     view 
     returns(bool) {
         //TODO: add ERC176 or whatever it is.
-        return IERC165(contractSeekingRegistration).supportsInterface(type(IVoteContract).interfaceId);
+        return IERC165(msg.sender).supportsInterface(type(IVoteContract).interfaceId);
+    }
+
+    modifier isRegistered {
+        if (reverseRegistry[msg.sender]!=0){
+            revert NotRegistered(msg.sender);
+        }
+        _;
     }
 
     modifier registrationReentrancyGuard {
-        if (_alreadyRegistered[msg.sender]){
+        if (reverseRegistry[msg.sender]==0){
             revert AlreadyRegistered(msg.sender);
         }
         _;
-        _alreadyRegistered[msg.sender] = true;
     }
 
     modifier isInterfaceImplementer {
-        if (!_implementsInterface(msg.sender)){
+        if (!_implementsInterface()){
             revert notInterfaceImplementer(msg.sender);
         }
         _;
     }
 
-    modifier isRegisteredSelector(bytes4 selector){
-        if (address(voteContract[selector])==address(0)){
-            revert InvalidVoteContractSelector(voteContract[selector]);
-        }
-        _;
-    }
+   
 }
 
 contract VotingRegistry is Registration {
@@ -70,15 +152,27 @@ contract VotingRegistry is Registration {
     external 
     isInterfaceImplementer
     registrationReentrancyGuard
+    returns (uint256)
     {
-        _register();
+        return _register();
     }
 
-    function getVoteContract(bytes4 selector) 
-    external
-    view
-    isRegisteredSelector(selector)
-    returns(IVoteContract) {
-        return voteContract[selector];
+    function register(bytes4[] memory categories) 
+    external 
+    isInterfaceImplementer
+    registrationReentrancyGuard
+    returns (uint256)
+    {
+        return _registerWithCategories(categories);
     }
+
+    function addCategories(bytes4[] memory categories) 
+    external 
+    isRegistered
+    isInterfaceImplementer
+    {
+        _addCategories(reverseRegistry[msg.sender], categories);
+    }
+
+    
 }
