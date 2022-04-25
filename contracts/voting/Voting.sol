@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import {IVoting, IGetCurrentIndex} from "./IVoting.sol";
 import {IVoteContract} from "../voteContract/IVoteContract.sol";
-import {IVotingRegistry, VotingRegistryAddress} from "../registry/IVotingRegistry.sol";
+import {IVotingRegistry, REGISTRY} from "../registry/IVotingRegistry.sol";
 
 // should be possible to 
 // - vote with time thresholds, below and above (i.e. deadline).
@@ -30,7 +30,7 @@ abstract contract RegistryHandling {
     IVotingRegistry public votingRegistry;
 
     function _loadVotingRegistry() internal {
-        votingRegistry = IVotingRegistry(VotingRegistryAddress);
+        votingRegistry = IVotingRegistry(REGISTRY);
     }
 }
 

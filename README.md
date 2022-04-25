@@ -1,9 +1,22 @@
-# Advanced Sample Hardhat Project
+# Voting Registry
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+## Overview
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
+It would be great to have a simple registry where all possible voting interfaces and varieties can be registered and queried. This would solve the problem of needing to deploy the n-th version of a simple majority voting dapp, or token-wheighted voting dapp or first-pass-the-post dapp or delegated voting dapp or aggregated voting dapp or what not. Every type of customized voting functionality could be implemented, too. The user contract simply implements a simple interface and can just choose which voting dapp it uses for its votes. It would hook up to the registry and receive the voting app that meets the needs. The voting app needs to have three functions implemented, namely `start`, `vote` and `implement`. The first one, i.e. `start`, receives the `votingParameters` in *byte*-form and, depending on the requirements, also the implementation parameters (`selector` in *bytes4* and `functionParameters` in *bytes*). The second one, i.e. `vote`, handles the logic of the voting that depends on the votingParameters passed in the `start`-function. The last one, namely `implement`, handles the action taken when the conditions for the vote are met. Optionally each voting app may also implement all sorts of other functions and auxilliary functions.
 
+## Ingredients
+
+The whole setup consists of 
+
+    1. A voting registry
+    2. Voting Contracts
+    3. Voting Integrations (Implementers)
+
+![votingRegistry](img/votingRegistry.drawio.png)
+
+
+
+## Some useful Hardhat commands
 Try running some of the following tasks:
 
 ```shell
@@ -24,23 +37,3 @@ npx prettier '**/*.{json,sol,md}' --write
 npx solhint 'contracts/**/*.sol'
 npx solhint 'contracts/**/*.sol' --fix
 ```
-
-# Etherscan verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
-
-```shell
-hardhat run --network ropsten scripts/deploy.ts
-```
-
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
-
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
-```
-
-# Performance optimizations
-
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).

@@ -6,12 +6,20 @@ import {IVoteContract} from "../voteContract/IVoteContract.sol";
 
 // TODO should be deployed always to the same address!
 // TODO: Use the same trick as ERC1860 or whatever the global registry is called.
-address constant VotingRegistryAddress = 0x0000000000000000000000000000000000000000;
+address constant REGISTRY = 0x1460ce805f5E6dc4Afd65960c7a8DD23bB3EeF6A;
 
 
 interface IVotingRegistry {
 
-    function register() external;
+    function register() external returns(uint256 registrationIndex);
+    function register(bytes8) external returns(uint256 registrationIndex);
+    function register(bytes8[] memory) external returns(uint256 registrationIndex);
+    function register(bytes8, string memory) external returns(uint256 registrationIndex);
+    function register(bytes8[] memory, string[] memory) external returns(uint256 registrationIndex);
+    function isRegistered(address) external;
 
-    function getVoteContract(bytes4 selector) external returns(IVoteContract voteContract);
+    function addCategoryToRegistration(bytes8) external;
+    function addCategoryToRegistration(bytes8, string memory) external;
+    function isRegisteredCategory(bytes8) external;
+
 }
