@@ -8,7 +8,6 @@ import {IVotingRegistry} from "./IVotingRegistry.sol";
 
 error AlreadyRegistered(address contractSeekingRegistration);
 error notInterfaceImplementer(address contractSeekingRegistration);
-error InvalidVoteContractSelector(IVoteContract voteContractSelector);
 error NotRegistered(address notRegisteredContract);
 
 

@@ -41,7 +41,7 @@ abstract contract VoteContractCategory {
 abstract contract VoteContract is IERC165, VoteContractCategory, RegisterVoteContract, IVoteContract {
 
     mapping(address=>uint256) internal _registeredVotes;
-    // votingStatus:  0 = inactive, 1 = active, 2 = completed, 3 = failed, 4 = stopped
+    // votingStatus:  0 = inactive, 1 = active, 2 = completed, 3 = failed
     // we deliberately don't use enums that are fixed, because the end user should choose how many statuses there are.
     mapping(address=>mapping(uint256=>uint256)) internal votingStatus; 
 
@@ -52,11 +52,13 @@ abstract contract VoteContract is IERC165, VoteContractCategory, RegisterVoteCon
 
     // VOTING PRIMITIVES
 
-    function start(bytes memory votingParams) public virtual override(IVoteContract) returns(uint256 index) {
+    function start(bytes memory votingParams) public virtual override(IVoteContract) returns(uint256 voteIndex) {
         return 0;
     }
 
-    function vote(uint256 index) external virtual override(IVoteContract);
+    function vote(uint256 voteIndex, address voter, uint256 option) external virtual override(IVoteContract);
+
+    function result(uint256 voteIndex) external virtual override(IVoteContract) returns(bytes memory votingResult);
 
     function getVotingParamsEncodingSelector() public virtual view override(VoteContractCategory) returns(bytes4);
 

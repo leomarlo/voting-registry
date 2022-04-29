@@ -1,40 +1,40 @@
-//SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.4;
+// //SPDX-License-Identifier: Unlicense
+// pragma solidity ^0.8.4;
 
-import {CanVote} from "../implementing/CanVote.sol";
+// import {CanVote} from "../implementing/CanVote.sol";
 
-interface IAmSpecial {
-    function makeMeSpecial(address specialPerson) external;
-}
+// interface IAmSpecial {
+//     function makeMeSpecial(address specialPerson) external;
+// }
 
-contract TestUser is CanVote, IAmSpecial {
+// contract TestUser is CanVote, IAmSpecial {
 
-    mapping(address=>bool) public specialAccounts;
-    address public owner;
+//     mapping(address=>bool) public specialAccounts;
+//     address public owner;
     
-    constructor () {
-        _connectToVotingApp();
-        owner = msg.sender;
-    }
+//     constructor () {
+//         _connectToVotingApp();
+//         owner = msg.sender;
+//     }
 
-    function whitelistVoteContract(bytes4 selector)
-    external
-    {
-        require(msg.sender==owner, "Only owner");
-        _addWhitelistedVoteContract(selector);
-    }
+//     function whitelistVoteContract(bytes4 selector)
+//     external
+//     {
+//         require(msg.sender==owner, "Only owner");
+//         _addWhitelistedVoteContract(selector);
+//     }
 
-    function makeMeSpecial(address specialPerson)
-    external
-    override(IAmSpecial)
-    onlyByVoteOrByOwner
-    {
-        specialAccounts[specialPerson] = true;
-    }
+//     function makeMeSpecial(address specialPerson)
+//     external
+//     override(IAmSpecial)
+//     onlyByVoteOrByOwner
+//     {
+//         specialAccounts[specialPerson] = true;
+//     }
 
-    modifier onlyByVoteOrByOwner {
-        require(_callerIsVotingApp() || msg.sender==owner, "I told ya!");
-        _;
-    }
+//     modifier onlyByVoteOrByOwner {
+//         require(_callerIsVotingApp() || msg.sender==owner, "I told ya!");
+//         _;
+//     }
 
-}
+// }
