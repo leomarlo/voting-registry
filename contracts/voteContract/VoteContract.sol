@@ -5,49 +5,65 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 // TODO: this should be accessible via a npm package
 import {IVotingRegistry, REGISTRY} from "../registry/IVotingRegistry.sol";
 import {IVoteContract, IVoteAndImplementContract} from "./IVoteContract.sol";
+import {IRegisterVoteContract} from "./IRegisterVoteContract.sol";
 
 
-abstract contract RegisterVoteContract {
+error StatusPermitsVoting(address caller, uint256 voteIndex);
 
 
-    function _registerVoteContract(bytes8 categoryId, string memory name)
+abstract contract RegisterVoteContract is IERC165 {
+
+
+    function _register(bytes8 categoryId)
     internal 
     {
-        IVotingRegistry(REGISTRY).register(categoryId, name);
-    }
-}
-
-abstract contract VoteContractCategory {
-    bytes8 public categoryId;
-
-    function getCategoryId(uint8 version, uint56 _typeId) internal view returns(bytes8){
-        return bytes8(bytes32(abi.encodePacked(
-            version,
-            _typeId,
-            getVotingParamsEncodingSelector())));
+        IVotingRegistry(REGISTRY).register(categoryId);
     }
 
-    function getVotingParamsEncodingSelector() public virtual view returns(bytes4) ;
+    function _addCategoryToRegistration(bytes8 categoryId)
+    internal 
+    {
+        IVotingRegistry(REGISTRY).addCategoryToRegistration(categoryId);
+    }
 
-    function getTypeId() public view returns(uint56){
-        uint56 typeId = 1 ; 
-        // TODO: get the typeId out of the categoryId
-        return typeId;
+    function supportsInterface(bytes4 interfaceId) public pure override(IERC165) returns (bool) {
+        return 
+            interfaceId == type(IVoteContract).interfaceId ||
+            interfaceId == type(IERC165).interfaceId;
     }
 }
 
 
+enum VotingStatus {inactive, completed, failed, active};
 
-abstract contract VoteContract is IERC165, VoteContractCategory, RegisterVoteContract, IVoteContract {
-
-    mapping(address=>uint256) internal _registeredVotes;
-    // votingStatus:  0 = inactive, 1 = active, 2 = completed, 3 = failed
+abstract contract VotingStatusHandling {
+    // votingStatus:  0 = inactive, 1 = completed, 2 = failed, 3 = active,
     // we deliberately don't use enums that are fixed, because the end user should choose how many statuses there are.
     mapping(address=>mapping(uint256=>uint256)) internal votingStatus; 
 
-    constructor(uint56 _typeId, string memory name) { 
-        categoryId = getCategoryId(uint8(1), _typeId);
-        _registerVoteContract(categoryId, name);
+    function _statusPermitsVoting(uint256 voteIndex) internal returns(bool) {
+        return votingStatus[msg.sender][voteIndex] > 3;
+    }
+
+    function getCurrentVotingStatus(uint256 voteIndex) view external returns(uint256) {
+        return votingStatus[msg.sender][voteIndex];
+    }
+
+    modifier statusPermitsVoting(uint256 voteIndex) {
+        if (!_statusPermitsVoting(voteIndex)) {
+            revert StatusPermitsVoting(msg.sender, voteIndex);
+        }
+        _;
+    }
+}
+
+
+abstract contract VoteContract is IERC165, RegisterVoteContract, IVoteContract {
+
+    mapping(address=>uint256) internal _registeredVotes;
+
+    constructor(bytes8 _categoryId) { 
+        _register(_categoryId);
     }
 
     // VOTING PRIMITIVES
@@ -58,54 +74,55 @@ abstract contract VoteContract is IERC165, VoteContractCategory, RegisterVoteCon
 
     function vote(uint256 voteIndex, address voter, uint256 option) external virtual override(IVoteContract);
 
-    function result(uint256 voteIndex) external virtual override(IVoteContract) returns(bytes memory votingResult);
+    function result(uint256 voteIndex) external view virtual override(IVoteContract) returns(bytes32 votingResult);
 
-    function getVotingParamsEncodingSelector() public virtual view override(VoteContractCategory) returns(bytes4);
-
-    // function resume(uint256 index) external virtual override(IVoteContract);
-
-    // function stop(uint256 index) external virtual override(IVoteContract) {
-    //     votingStatus[msg.sender][index] = 4;
-    // }
-
-
-    function supportsInterface(bytes4 interfaceId) public pure override(IERC165) returns (bool) {
-        return 
-            interfaceId == type(IVoteContract).interfaceId ||
-            interfaceId == type(IERC165).interfaceId;
-            // super.supportsInterface(interfaceId);
+    function condition(uint voteIndex) internal view returns(bool) {
+        return false;
     }
 
-    function getCurrentVoteIndex() view public returns(uint256){
-        return _registeredVotes[msg.sender];
+    function getCurrentVoteIndex(address caller) view public returns(uint256){
+        return _registeredVotes[caller];
     }
 
-    modifier iterateVoteIndex {
+    modifier incrementVoteIndex {
         _registeredVotes[msg.sender] += 1;
         _;
     }
     
 }
 
+struct Callback {
+    bytes4 selector,
+    bytes arguments
+}
 
 abstract contract VoteAndImplementContract is VoteContract, IVoteAndImplementContract {
 
-    mapping(address=>mapping(uint256=>bytes4)) internal callbackSelectors;
-    mapping(address=>mapping(uint256=>bytes)) internal callbackParams;
+    mapping(address=>mapping(uint256=>Callback)) internal callback;
 
 
     function _implement(uint256 votingIndex) internal returns(bool success) {
-        (success, ) = msg.sender.call(abi.encodePacked(callbackSelectors[msg.sender][votingIndex], callbackParams[msg.sender][votingIndex]));
+        (success, ) = msg.sender.call(
+            abi.encodePacked(
+                callback[msg.sender][votingIndex].selector,
+                callback[msg.sender][votingIndex].arguments));
     }
 
     function start(
+        bytes memory _votingParams,
         bytes4 _callbackSelector,
-        bytes memory _callbackParams,
-        bytes memory _votingParams)
+        bytes memory _callbackArgs)
     external override(IVoteAndImplementContract) returns(uint256 index) {
         index = start(_votingParams);
-        callbackSelectors[msg.sender][index] = _callbackSelector;
-        callbackParams[msg.sender][index] = _callbackParams;
+        callback[msg.sender][index] = Callback({
+            selector: _callbackSelector,
+            arguments: _callbackArgs});
+    }
+
+    function supportsInterface(bytes4 interfaceId) public pure override(VoteContract) returns (bool) {
+        return 
+            super.supportsInterface(interfaceId) ||
+            interfaceId == type(IVoteAndImplementContract).interfaceId;
     }
 }
 

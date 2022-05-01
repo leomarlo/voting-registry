@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {IVoteContract} from "../voteContract/IVoteContract.sol";
 import {IVotingRegistry} from "./IVotingRegistry.sol";
@@ -92,7 +93,6 @@ abstract contract CategoryRegistration {
     */
     
     mapping(uint256=>bytes8) internal _registeredCategories;
-    mapping(uint256=>string) internal _registeredCategoryName;
     mapping(bytes8=>uint256) internal _reverseCategoryLookup;
     uint256 internal _numberOfRegisteredCategories;
 
@@ -108,14 +108,6 @@ abstract contract CategoryRegistration {
         _reverseCategoryLookup[categoryId] = _numberOfRegisteredCategories;
     }
 
-    function _registerCategoryWithName(bytes8 categoryId, string memory name)
-    internal
-    {
-        _registerCategory(categoryId);
-        _registeredCategoryName[_numberOfRegisteredCategories] = name;
-    }
-
-
     /*
     * GETTER FUNCTIONS
     */
@@ -126,14 +118,6 @@ abstract contract CategoryRegistration {
     returns(bytes8)
     {
         return _registeredCategories[index];
-    }
-
-    function getRegisteredCategoryNameFromId(bytes8 _category) 
-    external 
-    view 
-    returns(string memory)
-    {
-        return _registeredCategoryName[_reverseCategoryLookup[_category]];
     }
 
 
@@ -156,7 +140,7 @@ abstract contract CategoryRegistration {
 }
 
 
-abstract contract ERC165Implementer {
+abstract contract VoteContractImplementer {
 
     function _implementsInterface()
     internal 
@@ -173,7 +157,11 @@ abstract contract ERC165Implementer {
     }
 }
 
-contract Registry is ERC165Implementer, CategoryRegistration, VotingContractRegistration {
+// abstract contract RegistryToken is ERC721 {
+
+// }
+
+contract Registry is VoteContractImplementer, CategoryRegistration, VotingContractRegistration {
 
     mapping(address=>mapping(uint256=>bytes8)) internal _categoriesOfRegistration;
     mapping(address=>uint256) internal _numberOfCategoriesOfRegistration;
@@ -183,14 +171,6 @@ contract Registry is ERC165Implementer, CategoryRegistration, VotingContractRegi
     * MUTATIVE FUNCTIONS
     */
 
-    function register()
-    external
-    notYetRegistered
-    isInterfaceImplementer
-    returns(uint256 registrationIndex)
-    {
-        registrationIndex = _registerVotingContract();
-    }
 
     function register(bytes8 _categoryId)
     external
@@ -203,56 +183,11 @@ contract Registry is ERC165Implementer, CategoryRegistration, VotingContractRegi
         
     }
 
-    function register(bytes8[] memory _categoryIds)
-    external
-    notYetRegistered
-    isInterfaceImplementer
-    returns(uint256 registrationIndex)
-    {
-        registrationIndex = _registerVotingContract();
-        for (uint256 i; i<_categoryIds.length; i++){
-            _addCategoryToRegistrationAndUpdateCategoryRegistry(_categoryIds[i]);     
-        }
-    }
-
-    function register(bytes8 _categoryId, string memory _categoryName)
-    external
-    notYetRegistered
-    isInterfaceImplementer
-    returns(uint256 registrationIndex)
-    {
-        registrationIndex = _registerVotingContract();
-        _registerVotingContract();
-        _addCategoryToRegistrationAndUpdateCategoryRegistry(_categoryId, _categoryName); 
-        
-    }
-
-    function register(bytes8[] memory _categoryIds, string[] memory _categoryNames)
-    external
-    notYetRegistered
-    isInterfaceImplementer
-    returns(uint256 registrationIndex)
-    {
-        registrationIndex = _registerVotingContract();
-        require(_categoryIds.length == _categoryNames.length, "unequal lengths");
-        _registerVotingContract();
-        for (uint256 i; i<_categoryIds.length; i++){
-            _addCategoryToRegistrationAndUpdateCategoryRegistry(_categoryIds[i], _categoryNames[i]); 
-        }
-    }
-
     function addCategoryToRegistration(bytes8 categoryId)
     external
     onlyRegistered
     {
         _addCategoryToRegistrationAndUpdateCategoryRegistry(categoryId);
-    }
-
-    function addCategoryToRegistration(bytes8 categoryId, string memory name) 
-    external
-    onlyRegistered
-    {
-        _addCategoryToRegistrationAndUpdateCategoryRegistry(categoryId, name);
     }
 
     // helper functions    
@@ -265,13 +200,6 @@ contract Registry is ERC165Implementer, CategoryRegistration, VotingContractRegi
         _registerCategory(categoryId);
     }
 
-    function _addCategoryToRegistrationAndUpdateCategoryRegistry(bytes8 categoryId, string memory name) 
-    internal
-    addCategoryToRegistrationWrapper(categoryId)
-    {
-        // update category registry
-        _registerCategoryWithName(categoryId, name);
-    }
 
     /*
     * MODIFIERS

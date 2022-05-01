@@ -11,15 +11,10 @@ address constant REGISTRY = 0x1460ce805f5E6dc4Afd65960c7a8DD23bB3EeF6A;
 
 interface IVotingRegistry {
 
-    function register() external returns(uint256 registrationIndex);
     function register(bytes8) external returns(uint256 registrationIndex);
-    function register(bytes8[] memory) external returns(uint256 registrationIndex);
-    function register(bytes8, string memory) external returns(uint256 registrationIndex);
-    function register(bytes8[] memory, string[] memory) external returns(uint256 registrationIndex);
-    function isRegistered(address) external;
+    function isRegistered(address) view external;
 
     function addCategoryToRegistration(bytes8) external;
-    function addCategoryToRegistration(bytes8, string memory) external;
-    function isRegisteredCategory(bytes8) external;
+    function isRegisteredCategory(bytes8) view external;
 
 }

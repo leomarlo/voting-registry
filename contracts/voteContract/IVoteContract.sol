@@ -8,18 +8,17 @@ interface IVoteContract {
 
     function vote(uint256 voteIndex, address voter, uint256 option) external;
 
-    function result(uint256 voteIndex) external returns(bytes memory votingResult);
-
-    // function stop(uint256 index) external;
-
-    // function resume(uint256 index) external;
-
+    /**
+     * @notice The result can be the casted version of an address, an integer or a pointer to a mapping that contains the entire result.
+     */
+    function result(uint256 voteIndex) external view returns(bytes32 votingResult);
 }
+
 
 interface IVoteAndImplementContract is IVoteContract {
     function start(
-        bytes4 callbackSelector,
-        bytes memory callbackParams,
-        bytes memory votingParams)
+        bytes memory _votingParams,
+        bytes4 _callbackSelector,
+        bytes memory _callbackArgs)
     external returns(uint256 index); 
 }
