@@ -7,8 +7,6 @@ error AlreadyVoted(address voter); // TODO: add more fields
 error VotingNotAllowed(uint256 voteIndex, address callingContract);
 
 
-
-
 contract SimpleMajorityVote is VoteContract {
 
     mapping(address=>mapping(uint256=>int256)) internal aggregateVotes;
@@ -34,17 +32,18 @@ contract SimpleMajorityVote is VoteContract {
     function vote(uint256 voteIndex, address voter, uint256 option) 
     external
     override(VoteContract) 
-    statusPermitsVoting(voteIndex)
+    permitsVoting(voteIndex)
     doubleVotingGuard(voteIndex, voter)
+    returns(uint256)
     {
         
         if (condition(voteIndex)==true){
             updateStatus(voteIndex);
-            return;
+            return votingStatus[msg.sender][voteIndex];
         }
 
         aggregateVotes[msg.sender][voteIndex] += (option == 0) ? int256(1) : int256(-1);
-        
+        return votingStatus[msg.sender][voteIndex];
     }
 
     function condition(uint voteIndex) internal view override(VoteContract) returns(bool) {
@@ -52,8 +51,12 @@ contract SimpleMajorityVote is VoteContract {
     }
 
 
-    function updateStatus(uint256 voteIndex) internal returns(uint256 _votingStatus){
+    function updateStatus(uint256 voteIndex) internal {
         votingStatus[msg.sender][voteIndex] = aggregateVotes[msg.sender][voteIndex]==0 ? uint256(VotingStatus.failed) : uint256(VotingStatus.completed);
+    }
+
+    function statusPermitsVoting(uint256 voteIndex) view external override(VoteContract) returns(bool) {
+        return _statusPermitsVoting(voteIndex);
     }
 
     
@@ -62,11 +65,11 @@ contract SimpleMajorityVote is VoteContract {
     }
 
 
-    function encodeVotingParams(uint256 duration) public view  returns(bytes memory){
+    function encodeVotingParams(uint256 duration) public pure  returns(bytes memory){
         return abi.encode(duration);
     }
 
-    function decodeVotingParams(bytes memory votingParams) public view returns(uint256 duration) {
+    function decodeVotingParams(bytes memory votingParams) public pure returns(uint256 duration) {
         (duration) = abi.decode(votingParams, (uint256));
     }
 
@@ -78,7 +81,5 @@ contract SimpleMajorityVote is VoteContract {
         _;
         alreadyVoted[msg.sender][voteIndex][voter] = true;
     }
-
-    
   
 }
