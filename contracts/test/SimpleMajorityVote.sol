@@ -9,7 +9,7 @@ error VotingNotAllowed(uint256 voteIndex, address callingContract);
 
 
 
-contract TestVoteContract is VoteContract {
+contract SimpleMajorityVote is VoteContract {
 
     mapping(address=>mapping(uint256=>int256)) internal aggregateVotes;
     mapping(address=>mapping(uint256=>uint256)) internal deadline;
@@ -21,12 +21,13 @@ contract TestVoteContract is VoteContract {
     function start(bytes memory votingParams) 
     public 
     override(VoteContract)
-    incrementVoteIndex
+    activateNewVote
     returns(uint256 voteIndex)
     {
-        voteIndex = getCurrentVoteIndex();
+        voteIndex = getCurrentVoteIndex(msg.sender);
+        // set voting parameters
         deadline[msg.sender][voteIndex] = block.timestamp + decodeVotingParams(votingParams);
-        votingStatus[msg.sender][voteIndex] = uint256(VotingStatus.active);
+        
     }
 
 
@@ -38,11 +39,11 @@ contract TestVoteContract is VoteContract {
     {
         
         if (condition(voteIndex)==true){
-            updateVotingStatus(voteIndex);
+            updateStatus(voteIndex);
             return;
         }
 
-        aggregateVotes[msg.sender][voteIndex] += option == 0 ? 1 : (-1);
+        aggregateVotes[msg.sender][voteIndex] += (option == 0) ? int256(1) : int256(-1);
         
     }
 
@@ -51,14 +52,13 @@ contract TestVoteContract is VoteContract {
     }
 
 
-    function updateVotingStatus(uint256 voteIndex) internal returns(uint256 _votingStatus){
-        bool invalid = votes[msg.sender][voteIndex].pro == votes[msg.sender][voteIndex].contra;
-        votingStatus[msg.sender][voteIndex] = invalid ? uint256(VotingStatus.failed) : uint256(VotingStatus.completed);
+    function updateStatus(uint256 voteIndex) internal returns(uint256 _votingStatus){
+        votingStatus[msg.sender][voteIndex] = aggregateVotes[msg.sender][voteIndex]==0 ? uint256(VotingStatus.failed) : uint256(VotingStatus.completed);
     }
 
     
-    function result(uint256 voteIndex) external virtual override(VoteContract) returns(bytes32 votingResult){
-        return bytes32(aggregateVotes);
+    function result(uint256 voteIndex) external view override(VoteContract) returns(bytes32 votingResult){
+        return bytes32(uint256(aggregateVotes[msg.sender][voteIndex]));
     }
 
 

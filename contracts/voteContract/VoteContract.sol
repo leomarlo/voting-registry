@@ -5,7 +5,6 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 // TODO: this should be accessible via a npm package
 import {IVotingRegistry, REGISTRY} from "../registry/IVotingRegistry.sol";
 import {IVoteContract, IVoteAndImplementContract} from "./IVoteContract.sol";
-import {IRegisterVoteContract} from "./IRegisterVoteContract.sol";
 
 
 error StatusPermitsVoting(address caller, uint256 voteIndex);
@@ -26,7 +25,7 @@ abstract contract RegisterVoteContract is IERC165 {
         IVotingRegistry(REGISTRY).addCategoryToRegistration(categoryId);
     }
 
-    function supportsInterface(bytes4 interfaceId) public pure override(IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public pure virtual override(IERC165) returns (bool) {
         return 
             interfaceId == type(IVoteContract).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
@@ -34,7 +33,7 @@ abstract contract RegisterVoteContract is IERC165 {
 }
 
 
-enum VotingStatus {inactive, completed, failed, active};
+enum VotingStatus {inactive, completed, failed, active}
 
 abstract contract VotingStatusHandling {
     // votingStatus:  0 = inactive, 1 = completed, 2 = failed, 3 = active,
@@ -58,7 +57,7 @@ abstract contract VotingStatusHandling {
 }
 
 
-abstract contract VoteContract is IERC165, RegisterVoteContract, IVoteContract {
+abstract contract VoteContract is IERC165, RegisterVoteContract, VotingStatusHandling, IVoteContract {
 
     mapping(address=>uint256) internal _registeredVotes;
 
@@ -76,7 +75,7 @@ abstract contract VoteContract is IERC165, RegisterVoteContract, IVoteContract {
 
     function result(uint256 voteIndex) external view virtual override(IVoteContract) returns(bytes32 votingResult);
 
-    function condition(uint voteIndex) internal view returns(bool) {
+    function condition(uint voteIndex) internal view virtual returns(bool) {
         return false;
     }
 
@@ -84,16 +83,23 @@ abstract contract VoteContract is IERC165, RegisterVoteContract, IVoteContract {
         return _registeredVotes[caller];
     }
 
-    modifier incrementVoteIndex {
+    function supportsInterface(bytes4 interfaceId) public pure virtual override(IERC165, RegisterVoteContract) returns (bool) {
+        return 
+            super.supportsInterface(interfaceId) ||
+            interfaceId == type(VoteContract).interfaceId;
+    }
+
+    modifier activateNewVote {
         _registeredVotes[msg.sender] += 1;
         _;
+        votingStatus[msg.sender][_registeredVotes[msg.sender]] = uint256(VotingStatus.active);
     }
     
 }
 
 struct Callback {
-    bytes4 selector,
-    bytes arguments
+    bytes4 selector;
+    bytes arguments;
 }
 
 abstract contract VoteAndImplementContract is VoteContract, IVoteAndImplementContract {
@@ -119,7 +125,7 @@ abstract contract VoteAndImplementContract is VoteContract, IVoteAndImplementCon
             arguments: _callbackArgs});
     }
 
-    function supportsInterface(bytes4 interfaceId) public pure override(VoteContract) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public pure virtual override(VoteContract) returns (bool) {
         return 
             super.supportsInterface(interfaceId) ||
             interfaceId == type(IVoteAndImplementContract).interfaceId;
