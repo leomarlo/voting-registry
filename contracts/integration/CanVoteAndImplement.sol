@@ -1,7 +1,9 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
-import {IVotingRegistry, REGISTRY} from "../registry/IVotingRegistry.sol";
+
+import {REGISTRY} from "../registry/RegistryAddress.sol";
+import {IVotingRegistry} from "../registry/IVotingRegistry.sol";
 import {IVoteContract, Callback, Response} from "../voteContract/IVoteContract.sol";
 import {ImplementCallback} from "../voteContract/VoteContract.sol";
 import {CanVote, Whitelisting, FunctionGuard} from "./CanVote.sol";
@@ -11,7 +13,7 @@ abstract contract CanVoteAndImplement is Whitelisting, ImplementCallback, Functi
 
     mapping(uint256=>Callback) internal callback;
 
-    constructor() CanVote(){}
+    // constructor() CanVote(){}
 
      function _start(
         bytes memory _votingParams,
@@ -29,6 +31,17 @@ abstract contract CanVoteAndImplement is Whitelisting, ImplementCallback, Functi
 
     function _implement(uint256 voteIndex) internal {
         callback[voteIndex].response = _implement(address(this), callback[voteIndex]); 
+    }
+
+    function _customFunctionGuard(bytes4 selector) 
+    internal 
+    view 
+    virtual
+    override(FunctionGuard)
+    returns(bool)
+    {
+        selector;  // silence warnings
+        return false;
     }
 
     function _functionGuard(bytes4 selector) 

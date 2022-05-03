@@ -15,6 +15,7 @@ contract SimpleMajorityVote is VoteContract {
 
     constructor(bytes8 _categoryId)
     VoteContract(_categoryId){}
+    // constructor()
 
     function start(bytes memory votingParams) 
     public 

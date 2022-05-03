@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
-
-import {IVotingRegistry, REGISTRY} from "../registry/IVotingRegistry.sol";
+import {REGISTRY} from "../registry/RegistryAddress.sol";
+import {IVotingRegistry} from "../registry/IVotingRegistry.sol";
 import {IVoteContract} from "../voteContract/IVoteContract.sol";
 
 error NotRegisteredVoteContract(address voteContract);
@@ -35,6 +35,9 @@ abstract contract FunctionGuard {
     }
 
     modifier votingGuard(bytes4 selector) {
+
+        // TODO: Can one get the selector from the msg.data ? 
+
         bool mayCallFunction = _functionGuard(selector) || _customFunctionGuard(selector);
         if (!mayCallFunction) {
             revert MayNotCallFunction(msg.sender);
@@ -50,9 +53,9 @@ abstract contract Whitelisting {
     mapping(address => bool) internal whitelistedVoteContract;
     mapping(bytes4 => address) internal voteContract;
     
-    constructor () {
-        whitelistedVoteContract[address(0)] = false;
-    }
+    // constructor () {
+    //     // whitelistedVoteContract[address(0)] = false;
+    // }
 
     function _selectorApproval(bytes4 selector, bool approval) internal {
         votable[selector] = approval;
@@ -124,7 +127,7 @@ abstract contract CanVote is Whitelisting {
     mapping(uint256=>VoteInfo) internal voteInfo;
     uint256 internal totalVotesStarted;
 
-    constructor() Whitelisting(){}
+    // constructor() Whitelisting(){}
 
     function _start(bytes4 selector, bytes memory votingParams) 
     internal

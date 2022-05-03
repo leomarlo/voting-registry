@@ -2,8 +2,9 @@
 pragma solidity ^0.8.4;
 
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-// TODO: this should be accessible via a npm package
-import {IVotingRegistry, REGISTRY} from "../registry/IVotingRegistry.sol";
+
+import {REGISTRY} from "../registry/RegistryAddress.sol";
+import {IVotingRegistry} from "../registry/IVotingRegistry.sol";
 import {IVoteContract, IVoteAndImplementContract, Callback, Response} from "./IVoteContract.sol";
 
 

@@ -17,6 +17,7 @@ if (deployRegistry) {
     getQuoteNickDeployAndVerify(
         hre.network.name,
         "Registry",
+        "contracts/registry/VotingRegistry.sol",
         [],
         "50")
     .then((res: txSuccess)=>{

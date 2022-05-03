@@ -3,6 +3,7 @@
     "deploy": "npx hardhat run ./scripts/deployment.ts",
     "getGanache": "npx hardhat run --no-compile ./scripts/getGanache.ts",
     "deployRegistry": "npx hardhat run ./scripts/registryDeployment.ts",
+    "deployVoteContracts": "npx hardhat run ./scripts/deployVoteContractStack.ts",
     "verifyAll": "npx hardhat run ./scripts/verification.ts"
   },
   "devDependencies": {

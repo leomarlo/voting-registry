@@ -22,9 +22,10 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
+let defaultNetwork: string = "localhost"
 const config: HardhatUserConfig = {
   solidity: "0.8.4",
-  defaultNetwork: "rinkeby",
+  defaultNetwork: defaultNetwork,
   networks: {
     rinkeby: {
       url: process.env.RINKEBY_URL || "",
@@ -33,15 +34,19 @@ const config: HardhatUserConfig = {
     localhost: {
       url: process.env.LOCALHOST + ":" + process.env.PORT,
       accounts: process.env.ALICE_PK !== undefined ? [process.env.ALICE_PK] : [],
-    }
+    },
+    mumbai: {
+      url: process.env.MUMBAI_RPC_ENDPOINT,
+      accounts: process.env.ALICE_PK !== undefined ? [process.env.ALICE_PK] : [],
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
-  },
+    apiKey: defaultNetwork=="mumbai"? process.env.POLYGONSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
+  }
 };
 
 export default config;

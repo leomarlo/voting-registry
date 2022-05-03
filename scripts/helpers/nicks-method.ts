@@ -34,7 +34,8 @@ async function printAccountBalance(provider: any, account: string | undefined, i
     let accountAddressString: string = account === undefined ? '': account
     let isfakeString : string = isFake? 'fake' : 'EOA or contract'
     let balance = (await provider.getBalance(accountAddressString)).toString()
-    console.log(`The balance of the ${isfakeString} account ${accountAddressString} is ${balance}`)
+    console.log(`The balance of the ${isfakeString} account ${accountAddressString} is ${balance}\n`)
+    console.log('Transaction is on:', provider.network)
 }
 
 
@@ -55,6 +56,7 @@ async function nickDeploy(networkName: string, txDataWeb3: unsignedWeb3Tx, price
     if (VERBOSITY>=1){
         await printAccountBalance(provider, fakeAccount, true)
         await printAccountBalance(provider, alice_wallet.address, false)
+        console.log(`Alice needs to pay ${priceInETH} in ETH to the fake account for it to cover deployment costs.`)
     }
     const tx_sent = await alice_wallet.sendTransaction({
         to: fakeAccount,
@@ -100,7 +102,7 @@ async function getTxDataAndPrice(contractName: string, args: Array<any>, gasPric
     let instance = await contract.deploy(...args, options)
     let deploymentTx = await instance.deployed()
     let receipt = await deploymentTx.deployTransaction.wait()
-    console.log(deploymentTx.deployTransaction)
+    console.log("\nLocalhost deployment transaction:\n", deploymentTx.deployTransaction, '\n')
     deploymentTx.deployTransaction.gasLimit.toHexString()
 
     let txData : unsignedWeb3Tx = {
@@ -132,13 +134,15 @@ async function getQuoteAndNickDeploy(networkName: string, contractName: string, 
     return contractDeploymentInfo
 }
 
-async function getQuoteNickDeployAndVerify(networkName: string, contractName: string, args: Array<any>, gasPriceInGwei: string) : Promise<txSuccess> {
+async function getQuoteNickDeployAndVerify(networkName: string, contractName: string, contractPath: string, args: Array<any>, gasPriceInGwei: string) : Promise<txSuccess> {
     let contractDeploymentInfo: txSuccess = await getQuoteAndNickDeploy(networkName, contractName, args, gasPriceInGwei)
     if (contractDeploymentInfo.successFlag && networkName!="localhost"){
-        verifyThisContract(contractDeploymentInfo.contractAddress, contractName)
+        verifyThisContract(contractDeploymentInfo.contractAddress, contractName, contractPath)
     }
     return contractDeploymentInfo;
 }
+
+// --rpc.allow-unprotected-txs
 
 function getProviderURL(networkName: string) : string {
     if (networkName=='localhost') {
@@ -146,6 +150,8 @@ function getProviderURL(networkName: string) : string {
         return localhostProviderURL + ':' + (process.env.PORT===undefined? '8545' : process.env.PORT)
     } else if (networkName=='rinkeby') {
         return process.env.RINKEBY_URL===undefined? '0x' : process.env.RINKEBY_URL
+    } else if (networkName=='mumbai') {
+        return process.env.MUMBAI_RPC_ENDPOINT===undefined? '0x' : process.env.MUMBAI_RPC_ENDPOINT
     } else {
         return ''
     }
