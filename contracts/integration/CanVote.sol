@@ -9,27 +9,66 @@ error IsNotWhitelistedVoteContract(address voteContract);
 error FunctionDoesntPermitVoting(bytes4 selector);
 error NotPermissibleVoteContractOrSelector(bytes4 selector, address voteContract);
 error DoesNotPermitVoting(uint256 voteIndex);
+error MayNotCallFunction(address caller);
 
+
+abstract contract FunctionGuard {
+    
+    function _customFunctionGuard(bytes4 selector) 
+    internal 
+    view 
+    virtual
+    returns(bool)
+    {
+        selector;  // silence warnings
+        return false;
+    }
+
+    function _functionGuard(bytes4 selector) 
+    internal 
+    view 
+    virtual
+    returns(bool)
+    {
+        selector;  // silence warnings
+        return true;
+    }
+
+    modifier votingGuard(bytes4 selector) {
+        bool mayCallFunction = _functionGuard(selector) || _customFunctionGuard(selector);
+        if (!mayCallFunction) {
+            revert MayNotCallFunction(msg.sender);
+        }
+        _;
+    }
+
+}
 
 abstract contract Whitelisting {
 
     mapping(bytes4 => bool) internal votable;
-    mapping(bytes4 => address) internal voteContract;
     mapping(address => bool) internal whitelistedVoteContract;
+    mapping(bytes4 => address) internal voteContract;
     
     constructor () {
         whitelistedVoteContract[address(0)] = false;
     }
 
-    function _approveSelector(bytes4 selector) internal {
-        votable[selector] = true;
+    function _selectorApproval(bytes4 selector, bool approval) internal {
+        votable[selector] = approval;
     }
 
-    function _disapproveSelector(bytes4 selector) internal {
-        votable[selector] = false;
+    function _supportsAdditionalInterfaces(address _voteContract)
+    internal 
+    virtual 
+    view 
+    returns(bool)
+    {
+        _voteContract;  // silence warnings
+        return true;
     }
 
-    function _approveVoteContractForSelector(bytes4 selector, address _voteContract) 
+    function _setVoteContractForSelector(bytes4 selector, address _voteContract) 
     internal 
     isWhitelisted(_voteContract)
     isVotable(selector)
@@ -37,36 +76,23 @@ abstract contract Whitelisting {
         voteContract[selector] = _voteContract;
     }
 
-    function _whitelistAndApprove(bytes4 selector, address _voteContract) 
+    function _whitelistContractAndSetSelector(bytes4 selector, address _voteContract) 
     internal 
     {
-        _addWhitelistedVoteContract(_voteContract);
-        _approveVoteContractForSelector(selector, _voteContract);
+        _whitelistVoteContract(_voteContract, true);
+        _setVoteContractForSelector(selector, _voteContract);
     }
 
-    function _addWhitelistedVoteContract(address _voteContract) 
+    function _whitelistVoteContract(address _voteContract, bool approve) 
     internal
-    isRegistered(_voteContract)
+    isLegitimateVoteContract(_voteContract)
     {
-        whitelistedVoteContract[_voteContract] = true;
+        whitelistedVoteContract[_voteContract] = approve;
     }
 
-    function _removeWhitelistedVoteContract(address _voteContract) 
-    internal
-    {
-        whitelistedVoteContract[_voteContract] = false;
-    }
-
-    function _isPermissibleVoteContractAndSelector(bytes4 selector, address _voteContract) 
-    internal 
-    view
-    returns(bool)
-    {
-        return votable[selector] && whitelistedVoteContract[_voteContract];
-    } 
-
-    modifier isRegistered(address _voteContract) {
-        if (!IVotingRegistry(REGISTRY).isRegistered(_voteContract)) {
+    modifier isLegitimateVoteContract(address _voteContract) {
+        bool legitimate = _supportsAdditionalInterfaces(_voteContract) && IVotingRegistry(REGISTRY).isRegistered(_voteContract);
+        if (!legitimate) {
             revert NotRegisteredVoteContract(_voteContract);
         }
         _;
@@ -82,13 +108,6 @@ abstract contract Whitelisting {
     modifier isVotable(bytes4 selector) {
         if (!votable[selector]) {
             revert FunctionDoesntPermitVoting(selector);
-        }
-        _;
-    }
-
-    modifier isPermissible(bytes4 selector, address _voteContract){
-        if (!_isPermissibleVoteContractAndSelector(selector, voteContract[selector])) {
-            revert NotPermissibleVoteContractOrSelector(selector,voteContract[selector] );
         }
         _;
     }
@@ -109,13 +128,16 @@ abstract contract CanVote is Whitelisting {
 
     function _start(bytes4 selector, bytes memory votingParams) 
     internal
-    isPermissible(selector, voteContract[selector])
+    isVotable(selector)
+    isWhitelisted(voteContract[selector])
+    returns(uint256)
     {
         totalVotesStarted += 1;
         VoteInfo memory _voteInfo;
         _voteInfo.voteContract = voteContract[selector];
         _voteInfo.index = IVoteContract(_voteInfo.voteContract).start(votingParams);
         voteInfo[totalVotesStarted] = _voteInfo;
+        return totalVotesStarted;
     }
 
     function getTotalVotesStarted() external view returns(uint256) {
@@ -130,7 +152,7 @@ abstract contract CanVote is Whitelisting {
     internal
     permitsVoting(voteIndex)
     {
-        uint256 status = IVoteContract(voteInfo[voteIndex].voteContract).vote(
+        IVoteContract(voteInfo[voteIndex].voteContract).vote(
             voteInfo[voteIndex].index,
             msg.sender,
             option
@@ -138,8 +160,11 @@ abstract contract CanVote is Whitelisting {
 
     }
 
+  
     modifier permitsVoting(uint256 voteIndex){
-        if(! IVoteContract(voteInfo[voteIndex].voteContract).statusPermitsVoting(voteInfo[voteIndex].index)){
+        bool permitted = IVoteContract(voteInfo[voteIndex].voteContract)
+            .statusPermitsVoting(voteInfo[voteIndex].index);
+        if(! permitted){
             revert DoesNotPermitVoting(voteIndex);
         }
         _;

@@ -1,9 +1,17 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
+enum Response {none, successful, failed}
 
-interface IVoteContract {
+struct Callback {
+    bytes4 selector;
+    bytes arguments;
+    Response response;
+}
+
+interface IVoteContract is IERC165{
     function start(bytes memory votingParams) external returns(uint256 voteIndex); 
 
     function vote(uint256 voteIndex, address voter, uint256 option) external returns(uint256 status);

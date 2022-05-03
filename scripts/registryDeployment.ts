@@ -4,7 +4,7 @@ import {getQuoteNickDeployAndVerify, txSuccess} from './helpers/nicks-method'
 
 getQuoteNickDeployAndVerify(
     hre.network.name,
-    "VotingRegistry",
+    "Registry",
     [],
     "50")
     .then((res: txSuccess)=>{

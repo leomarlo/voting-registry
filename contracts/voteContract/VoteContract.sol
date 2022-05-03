@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 // TODO: this should be accessible via a npm package
 import {IVotingRegistry, REGISTRY} from "../registry/IVotingRegistry.sol";
-import {IVoteContract, IVoteAndImplementContract} from "./IVoteContract.sol";
+import {IVoteContract, IVoteAndImplementContract, Callback, Response} from "./IVoteContract.sol";
 
 
 error StatusPermitsVoting(address caller, uint256 voteIndex);
@@ -40,11 +40,11 @@ abstract contract VotingStatusHandling{
     // we deliberately don't use enums that are fixed, because the end user should choose how many statuses there are.
     mapping(address=>mapping(uint256=>uint256)) internal votingStatus; 
 
-    function _statusPermitsVoting(uint256 voteIndex) view internal returns(bool) {
+    function _statusPermitsVoting(uint256 voteIndex) internal view returns(bool) {
         return votingStatus[msg.sender][voteIndex] > 3;
     }
 
-    function getCurrentVotingStatus(uint256 voteIndex) view external returns(uint256) {
+    function getCurrentVotingStatus(uint256 voteIndex) external view returns(uint256) {
         return votingStatus[msg.sender][voteIndex];
     }
 
@@ -75,9 +75,9 @@ abstract contract VoteContract is IERC165, RegisterVoteContract, VotingStatusHan
 
     function condition(uint voteIndex) internal view virtual returns(bool);
 
-    function statusPermitsVoting(uint256 voteIndex) view external virtual override(IVoteContract) returns(bool);
+    function statusPermitsVoting(uint256 voteIndex) external view virtual override(IVoteContract) returns(bool);
 
-    function getCurrentVoteIndex(address caller) view public returns(uint256){
+    function getCurrentVoteIndex(address caller) public view returns(uint256){
         return _registeredVotes[caller];
     }
 
@@ -95,26 +95,30 @@ abstract contract VoteContract is IERC165, RegisterVoteContract, VotingStatusHan
     
 }
 
-enum Response {none, successful, failed}
+abstract contract ImplementCallback {
 
-struct Callback {
-    bytes4 selector;
-    bytes arguments;
-    Response response;
+     function _implement(address _contract, Callback memory callback) 
+     internal 
+     returns(Response)
+     {
+        (bool success, ) = _contract.call(
+            abi.encodePacked(
+                callback.selector,
+                callback.arguments));
+        return success ? Response.successful : Response.failed; 
+    }
 }
 
-abstract contract VoteAndImplementContract is IVoteContract, VoteContract, IVoteAndImplementContract {
+abstract contract VoteAndImplementContract is IVoteContract, VoteContract, ImplementCallback, IVoteAndImplementContract {
 
     mapping(address=>mapping(uint256=>Callback)) internal callback;
 
     constructor(bytes8 _categoryId) VoteContract(_categoryId){}
 
-    function _implement(uint256 voteIndex) internal returns(bool success) {
-        (success, ) = msg.sender.call(
-            abi.encodePacked(
-                callback[msg.sender][voteIndex].selector,
-                callback[msg.sender][voteIndex].arguments));
-        callback[msg.sender][voteIndex].response = success ? Response.successful : Response.failed; 
+    function _implement(uint256 voteIndex) 
+    internal
+    {
+        callback[msg.sender][voteIndex].response = _implement(msg.sender, callback[msg.sender][voteIndex]);
     }
 
     function start(bytes memory votingParams) public virtual override(IVoteContract, VoteContract) returns(uint256 voteIndex) {
@@ -128,7 +132,7 @@ abstract contract VoteAndImplementContract is IVoteContract, VoteContract, IVote
 
     function condition(uint voteIndex) internal view virtual override(VoteContract) returns(bool);
 
-    function statusPermitsVoting(uint256 voteIndex) view external virtual override(IVoteContract, VoteContract) returns(bool);
+    function statusPermitsVoting(uint256 voteIndex) external view virtual override(IVoteContract, VoteContract) returns(bool);
 
     function start(
         bytes memory _votingParams,
@@ -152,7 +156,7 @@ abstract contract VoteAndImplementContract is IVoteContract, VoteContract, IVote
     }
 
 
-    function supportsInterface(bytes4 interfaceId) public pure virtual override(VoteContract) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public pure virtual override(IERC165, VoteContract) returns (bool) {
         return 
             super.supportsInterface(interfaceId) ||
             interfaceId == type(IVoteAndImplementContract).interfaceId;

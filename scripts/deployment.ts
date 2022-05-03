@@ -7,7 +7,7 @@ let deployRegistry: boolean = false
 
 let contractArgs:Array<contractPreDeployInfo> = [
     {
-        contractName: "VotingRegistry",
+        contractName: "Registry",
         deploymentArguments: []
     }
 ]
@@ -16,7 +16,7 @@ if (deployRegistry) {
 
     getQuoteNickDeployAndVerify(
         hre.network.name,
-        "VotingRegistry",
+        "Registry",
         [],
         "50")
     .then((res: txSuccess)=>{
