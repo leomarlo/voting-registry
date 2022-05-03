@@ -70,16 +70,18 @@ abstract contract VotingContractRegistration {
     */
 
     modifier onlyRegistered {
-        if (!isRegistered(msg.sender)){
-            revert NotRegistered(msg.sender);
-        }
+        // if (!isRegistered(msg.sender)){
+        //     revert NotRegistered(msg.sender);
+        // }
+        require(isRegistered(msg.sender), "is not registered");
         _;
     }
 
     modifier notYetRegistered {
-        if (isRegistered(msg.sender)){
-            revert AlreadyRegistered(msg.sender);
-        }
+        // if (isRegistered(msg.sender)){
+        //     revert AlreadyRegistered(msg.sender);
+        // }
+        require(!isRegistered(msg.sender), "is not yet registered");
         _;
     }
 }
@@ -150,9 +152,10 @@ abstract contract VoteContractImplementer {
     }
 
     modifier isInterfaceImplementer {
-        if (!_implementsInterface()){
-            revert notInterfaceImplementer(msg.sender);
-        }
+        // if (!_implementsInterface()){
+        //     revert notInterfaceImplementer(msg.sender);
+        // }
+        require(_implementsInterface(), "does not implement interface");
         _;
     }
 }

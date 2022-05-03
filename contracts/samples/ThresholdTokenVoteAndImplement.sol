@@ -31,8 +31,11 @@ contract ThresholdTokenVoteAndImplement is VoteAndImplementContract {
     mapping(address=>mapping(uint256=>Votes)) internal votes;
     mapping(address=>mapping(uint256=>mapping(address=>bool))) internal alreadyVoted;
 
-    constructor(bytes8 _categoryId)
-    VoteAndImplementContract(_categoryId){}
+    // constructor(bytes8 _categoryId)
+    // VoteAndImplementContract(_categoryId){}
+
+    // constructor(bytes8 _categoryId, address _registry)
+    // VoteAndImplementContract(_categoryId, _registry){}
 
     function start(bytes memory votingParams) 
     public 

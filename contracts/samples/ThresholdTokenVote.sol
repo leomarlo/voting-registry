@@ -30,8 +30,10 @@ contract ThresholdTokenVote is VoteContract {
     mapping(address=>mapping(uint256=>Votes)) internal votes;
     mapping(address=>mapping(uint256=>mapping(address=>bool))) internal alreadyVoted;
 
-    constructor(bytes8 _categoryId)
-    VoteContract(_categoryId){}
+    // constructor(bytes8 _categoryId)
+    // VoteContract(_categoryId){}
+    // constructor(bytes8 _categoryId, address _registry)
+    // VoteContract(_categoryId, _registry){}
 
     function start(bytes memory votingParams) 
     public 

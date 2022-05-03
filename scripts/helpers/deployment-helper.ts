@@ -2,6 +2,28 @@ import hre from "hardhat";
 import fs from 'fs';
 
 import {execShellCommand} from './shell'
+import { isBytesLike } from "ethers/lib/utils";
+
+
+interface contractPreDeployInfo {
+    contractName: string,
+    deploymentArguments: Array<any>
+}
+
+interface contractInfo extends contractPreDeployInfo {
+    contractAddress: string,
+}
+
+interface fullContractInfo extends contractInfo {
+    contract: Object,
+    receipt: Object
+}
+
+function delay(miliseconds: number){
+    return new Promise(function(resolve){
+        setTimeout(resolve,miliseconds);
+    });
+  }
 
 function saveToFile(obj : Object, name: string) {
     var jsonContent = JSON.stringify(obj, null, 2);
@@ -17,25 +39,29 @@ function saveToFile(obj : Object, name: string) {
     });
   }
 
-async function deployment(contractName:string, args: Array<any>) : Promise<string>{
-    let verbose: boolean = true
+interface RegisterVoteContract {
+    shouldBeRegistered: boolean,
+    registrationArgs: Array<string>
+}
+
+async function deployment(contractName:string, args: Array<any>, registerContract: RegisterVoteContract) : Promise<fullContractInfo>{
     const [ALICE] = await hre.ethers.getSigners()
-    const Nick = await hre.ethers.getContractFactory(contractName);
-    const nick = await Nick.connect(ALICE).deploy(...args);
-    if (verbose){
-        console.log('\nDeployment Message')
-        console.log(nick)
-        console.log('\nEnd of Deployment Message.\n')
-    }
-    let deploymentTx = await nick.deployed()
-    if (verbose){
-        console.log('\nDeployment Receipt')
-        console.log(deploymentTx)
-        console.log('\nEnd of Deployment Receipt.\n')
-    }
+    const Contract = await hre.ethers.getContractFactory(contractName);
+    const contract = await Contract.connect(ALICE).deploy(...args);
+    let deploymentTx = await contract.deployed()
     let receipt = await deploymentTx.deployTransaction.wait()
     //console.log(deploymentTx.deployTransaction.data)
-    return receipt.contractAddress
+    let returnObject :fullContractInfo = {
+        contractName: contractName,
+        contractAddress: receipt.contractAddress,
+        deploymentArguments: args,
+        contract: contract,
+        receipt: receipt
+    }
+    if (registerContract.shouldBeRegistered) {
+        let registration = await contract.register(...registerContract.registrationArgs)
+    }
+    return returnObject
 }
 
 function saveDeploymentArguments(contractName: string, variables: Array<any>) {
@@ -49,24 +75,21 @@ function saveDeploymentArguments(contractName: string, variables: Array<any>) {
 }
 
 
-interface contractPreDeployInfo {
-    contractName: string,
-    deploymentArguments: Array<any>
-}
-
-interface contractInfo extends contractPreDeployInfo {
-    contractAddress: string,
-}
-
 async function deployAll(contractArgs:Array<contractPreDeployInfo>): Promise<Array<contractInfo>>  {
     let returnInfo: Array<contractInfo> = [];
     for (let i=0; i<contractArgs.length; i++){
-
-        let address = await deployment(contractArgs[i].contractName, contractArgs[i].deploymentArguments) 
+        let registerContract: RegisterVoteContract = {
+            shouldBeRegistered: false,
+            registrationArgs: []
+        }
+        let contract: fullContractInfo = await deployment(
+            contractArgs[i].contractName,
+            contractArgs[i].deploymentArguments,
+            registerContract) 
         saveDeploymentArguments(contractArgs[i].contractName, contractArgs[i].deploymentArguments)
         returnInfo[i] = {
             ... contractArgs[i],
-            contractAddress: address
+            contractAddress: contract.contractAddress
         }
     }
     return returnInfo
@@ -95,6 +118,25 @@ async function setGlobalRegistryAddressAndCompile(address: string) {
     console.log(res);
 }
 
+async function registerVoteContract(contractName: string, categoryId: string): Promise<contractInfo> {
+    // deploy Three Voting contracts
+    let deploymentArgs : Array<string> = [];
+    let registerContract: RegisterVoteContract = {
+        shouldBeRegistered: true,
+        registrationArgs: [categoryId]
+    }
+    let contract: fullContractInfo = await deployment(
+        contractName,
+        deploymentArgs,
+        registerContract)
+    saveDeploymentArguments(contractName, deploymentArgs)
+    return {
+        contractName: contractName,
+        deploymentArguments: deploymentArgs,
+        contractAddress: contract.contractAddress
+    }
+}
+
 
 async function voteContractDeploymentStack(withRegistry: boolean): Promise<Array<contractInfo>>  {
 
@@ -105,8 +147,16 @@ async function voteContractDeploymentStack(withRegistry: boolean): Promise<Array
         // retrieve old address
         orginalRegistryAddress = retrieveAddressFromRegistryAddressSol()
 
-        // deploy registry
-        let registryAddress = await deployment("Registry", [])
+        // deploy registry (need to be registered itself)
+        let registerContract: RegisterVoteContract = {
+            shouldBeRegistered: false,
+            registrationArgs: []
+        }
+        let contract: fullContractInfo = await deployment(
+            "Registry",
+            [],
+            registerContract)
+        let registryAddress = contract.contractAddress
         saveDeploymentArguments("Registry", [])
         returnInfo.push({
             contractName: "Registry",
@@ -115,66 +165,44 @@ async function voteContractDeploymentStack(withRegistry: boolean): Promise<Array
         });
 
         // set globalAddress
-        setGlobalRegistryAddressAndCompile(registryAddress);
+        await setGlobalRegistryAddressAndCompile(registryAddress);
+
+        // await delay(6000);
+        
 
     }
 
-    // deploy Three Voting contracts
-    let SimpleMajorityVoteContractName = "SimpleMajorityVote"
-    let majorityVoteCategoryId = "0x0000000000000001"
-    let deploymentArgs = [majorityVoteCategoryId];
-    let address = await deployment(SimpleMajorityVoteContractName, deploymentArgs)
-    saveDeploymentArguments(SimpleMajorityVoteContractName, deploymentArgs)
-    returnInfo.push({
-        contractName: SimpleMajorityVoteContractName,
-        deploymentArguments: deploymentArgs,
-        contractAddress: address
-    });
-    
-    let SimpleMajorityVoteAndImplementContractName = "SimpleMajorityVoteAndImplement"
-    address = await deployment(SimpleMajorityVoteAndImplementContractName, deploymentArgs)
-    saveDeploymentArguments(SimpleMajorityVoteAndImplementContractName, deploymentArgs)
-    returnInfo.push({
-        contractName: SimpleMajorityVoteAndImplementContractName,
-        deploymentArguments: deploymentArgs,
-        contractAddress: address
-    });
+    let newVotecontract: contractInfo; 
 
-    let ThresholdTokenVoteName = "ThresholdTokenVote"
-    let tokenThresholdVoteCategoryId = "0x0000000000000002"
-    deploymentArgs = [tokenThresholdVoteCategoryId];
-    address = await deployment(ThresholdTokenVoteName, deploymentArgs)
-    saveDeploymentArguments(ThresholdTokenVoteName, deploymentArgs)
-    returnInfo.push({
-        contractName: ThresholdTokenVoteName,
-        deploymentArguments: deploymentArgs,
-        contractAddress: address
-    });
-
-    let ThresholdTokenVoteAndImplementName = "ThresholdTokenVoteAndImplement"
-    deploymentArgs = [tokenThresholdVoteCategoryId];
-    let thresholdVoteContractAddress = await deployment(ThresholdTokenVoteAndImplementName, deploymentArgs)
-    saveDeploymentArguments(ThresholdTokenVoteAndImplementName, deploymentArgs)
-    returnInfo.push({
-        contractName: ThresholdTokenVoteAndImplementName,
-        deploymentArguments: deploymentArgs,
-        contractAddress: thresholdVoteContractAddress
-    });
+    newVotecontract = await registerVoteContract("SimpleMajorityVote", "0x0000000000000001")
+    returnInfo.push(newVotecontract);
+    newVotecontract = await registerVoteContract("SimpleMajorityVoteAndImplement", "0x0000000000000001")
+    returnInfo.push(newVotecontract);
+    newVotecontract = await registerVoteContract("ThresholdTokenVote", "0x0000000000000002")
+    returnInfo.push(newVotecontract);
+    newVotecontract = await registerVoteContract("ThresholdTokenVoteAndImplement", "0x0000000000000002")
+    returnInfo.push(newVotecontract);
+    let thresholdVoteContractAddress: string = newVotecontract.contractAddress;
+   
 
     // deploy dummy integrator
     let DummyName = "DummyIntegrator"
-    deploymentArgs = [thresholdVoteContractAddress];
-    address = await deployment(DummyName, deploymentArgs)
+    let deploymentArgs = [thresholdVoteContractAddress];
+    let registerContract: RegisterVoteContract = {
+        shouldBeRegistered: false,
+        registrationArgs: []
+    }
+    let contract: fullContractInfo = await deployment(DummyName, deploymentArgs, registerContract)
     saveDeploymentArguments(DummyName, deploymentArgs)
     returnInfo.push({
         contractName: DummyName,
         deploymentArguments: deploymentArgs,
-        contractAddress: address
+        contractAddress: contract.contractAddress
     });
 
     if (withRegistry){
         // replace the old registry address and compile
-        setGlobalRegistryAddressAndCompile(orginalRegistryAddress);
+        await setGlobalRegistryAddressAndCompile(orginalRegistryAddress);
     }
 
     return returnInfo
@@ -190,14 +218,27 @@ async function deployVoteContractStackAndSave(withRegistry: boolean) {
 
 async function deployRegistry() : Promise<Array<string>> {
     let addresses : Array<string> = []
-    let registryAddress = await deployment("Registry", [])
+    let registerContract: RegisterVoteContract = {
+        shouldBeRegistered: false,
+        registrationArgs: []
+    }
+    let contract: fullContractInfo = await deployment("Registry", [], registerContract)
     saveDeploymentArguments("Registry", [])
-    console.log("registry Address: ", registryAddress)
-    addresses.push(registryAddress)
+    console.log("registry Address: ", contract.contractAddress)
+    addresses.push(contract.contractAddress)
 
-    let voteContractAddress = await deployment("SimpleMajorityVote", ["0x0000000000000001"])
-    saveDeploymentArguments("SimpleMajorityVote",  ["0x0000000000000001"])
-    addresses.push(voteContractAddress)
+    let verbose: boolean = true
+    const [ALICE] = await hre.ethers.getSigners()
+    const MajorityVote = await hre.ethers.getContractFactory("SimpleMajorityVote");
+    const _categoryId = "0x0000000000000001"
+    const isByteLike = isBytesLike(_categoryId)
+    console.log("isByteLike: ", isByteLike)
+
+    const majorityVote = await MajorityVote.connect(ALICE).deploy(); 
+    if (verbose){
+        console.log("majorityVote: ", majorityVote.deployTransaction)
+    }
+    addresses.push(majorityVote.address)
     return addresses
 }
 

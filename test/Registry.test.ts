@@ -1,38 +1,56 @@
-// import { expect } from "chai";
-// import { ethers } from "hardhat";
+import { expect } from "chai";
+import { ethers } from "hardhat";
+// import {voteContractDeploymentStack, deployVoteContractStackAndSave} from '../scripts/helpers/deployment-helper'
 
-// import {
-//     VotingRegistry,
-//     Voting
-// } from "../typechain";
+import {
+    Registry
+
+ } from "../typechain";
 
 
-// interface Contracts {
-//     voting: Voting;
-//     votingRegitry: VotingRegistry
-// }
+interface Contracts {
+    Registry: Registry,
 
-// async function deployContracts(): Promise<Contracts> {
-//     const VotingRegistry = await ethers.getContractFactory("VotingRegistry");
-//     const votingRegistry = await (await VotingRegistry.deploy()).deployed();
-    
-// }
+}
 
-// describe("Registry", function () {
-//   it("Should deploy the Voting Registry", async function () {
-//     votingRegistry = await VotingRegistry__factory.connect("abcde", ethers.provider).deployTransaction()
+async function deployContracts(): Promise<Contracts> {
+    const VotingRegistry = await ethers.getContractFactory("Registry");
+    const votingRegistry = await (await VotingRegistry.deploy()).deployed();
+    let contracts: Contracts = {
+        Registry: votingRegistry
+    } 
+    return contracts
+}
 
-//     const Greeter = await ethers.getContractFactory("Greeter");
-//     const greeter = await Greeter.deploy("Hello, world!");
-//     await greeter.deployed();
+describe("Registry", async function () {
+    describe("Deploy Registry", async function() {
+        it("Should deploy the Voting Registry", async function(){
+            let contracts: Contracts = await deployContracts();
+            let number = await contracts.Registry.numberOfRegistrations()
+            console.log("registration count", number.toString())
 
-//     expect(await greeter.greet()).to.equal("Hello, world!");
+        });
+    });
+    describe("Hook up Voting Contracts", async function() {
+        let contracts: Contracts;
+        beforeEach(async()=>{
+            contracts = await deployContracts();
+        });
+        it("should hook up VoteContract", async function() {
+            const SimpleMajorityVote = await ethers.getContractFactory("SimpleMajorityVote");
+            console.log("registry Address", contracts.Registry.address)
 
-//     const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
+            const simpleMajorityVote = await SimpleMajorityVote.deploy("0x0000000000000000", contracts.Registry.address)
+            console.log("deployment tx", simpleMajorityVote)
+            let tx = await simpleMajorityVote.register("0x0000000000000000", contracts.Registry.address)
+            console.log('tx', tx)
+            let number = await contracts.Registry.numberOfRegistrations()
+            console.log("registration count", number.toString())
+            // expect(await greeter.greet()).to.equal("Hola, mundo!");
+            // const RevertConstructor = await ethers.getContractFactory("RevertConstructor");
+            // const revertConstructor = await RevertConstructor.deploy()
+            // console.log("reversion", revertConstructor)
 
-//     // wait until the transaction is mined
-//     await setGreetingTx.wait();
-
-//     expect(await greeter.greet()).to.equal("Hola, mundo!");
-//   });
-// });
+        });
+    });
+});

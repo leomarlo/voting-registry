@@ -13,11 +13,11 @@ error StatusPermitsVoting(address caller, uint256 voteIndex);
 
 abstract contract RegisterVoteContract is IERC165 {
 
-
-    function _register(bytes8 categoryId)
-    internal 
+    // at some point stop using the registry argument
+    function register(bytes8 categoryId)
+    external 
     {
-        IVotingRegistry(REGISTRY).register(categoryId);
+        uint256 index = IVotingRegistry(REGISTRY).register(categoryId);
     }
 
     function _addCategoryToRegistration(bytes8 categoryId)
@@ -62,9 +62,9 @@ abstract contract VoteContract is IERC165, RegisterVoteContract, VotingStatusHan
 
     mapping(address=>uint256) internal _registeredVotes;
 
-    constructor(bytes8 _categoryId) { 
-        _register(_categoryId);
-    }
+    // constructor(bytes8 _categoryId, address _registry) { 
+    //     // _register(_categoryId,_registry);
+    // }
 
     // VOTING PRIMITIVES
 
@@ -114,7 +114,7 @@ abstract contract VoteAndImplementContract is IVoteContract, VoteContract, Imple
 
     mapping(address=>mapping(uint256=>Callback)) internal callback;
 
-    constructor(bytes8 _categoryId) VoteContract(_categoryId){}
+    // constructor(bytes8 _categoryId, address _registry) VoteContract(_categoryId, _registry){}
 
     function _implement(uint256 voteIndex) 
     internal

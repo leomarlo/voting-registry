@@ -13,9 +13,16 @@ contract SimpleMajorityVote is VoteContract {
     mapping(address=>mapping(uint256=>uint256)) internal deadline;
     mapping(address=>mapping(uint256=>mapping(address=>bool))) internal alreadyVoted;
 
-    constructor(bytes8 _categoryId)
-    VoteContract(_categoryId){}
+    // constructor(bytes8 _categoryId, address _registry)
+    // VoteContract(_categoryId, _registry){}
     // constructor()
+
+    // // FIXME!! Delete the explicit registration
+    // function register(bytes8 _categoryId, address _registry) 
+    // external
+    // {
+    //     _register(_categoryId, _registry);
+    // } 
 
     function start(bytes memory votingParams) 
     public 
