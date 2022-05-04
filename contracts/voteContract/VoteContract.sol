@@ -9,21 +9,25 @@ import {IVoteContract, IVoteAndImplementContract, Callback, Response} from "./IV
 
 
 error StatusPermitsVoting(address caller, uint256 voteIndex);
-
+error MayOnlyRegisterOnceByDeployer(address caller, bytes8 categoryId);
 
 abstract contract RegisterVoteContract is IERC165 {
 
+    bytes8[] public categories;
     // at some point stop using the registry argument
     function register(bytes8 categoryId)
     external 
     {
-        uint256 index = IVotingRegistry(REGISTRY).register(categoryId);
+        if (categories.length>0){revert MayOnlyRegisterOnceByDeployer(msg.sender, categoryId);}
+        IVotingRegistry(REGISTRY).register(categoryId);
+        categories.push(categoryId);
     }
 
     function _addCategoryToRegistration(bytes8 categoryId)
     internal 
     {
         IVotingRegistry(REGISTRY).addCategoryToRegistration(categoryId);
+        categories.push(categoryId);
     }
 
     function supportsInterface(bytes4 interfaceId) public pure virtual override(IERC165) returns (bool) {
@@ -42,7 +46,7 @@ abstract contract VotingStatusHandling{
     mapping(address=>mapping(uint256=>uint256)) internal votingStatus; 
 
     function _statusPermitsVoting(uint256 voteIndex) internal view returns(bool) {
-        return votingStatus[msg.sender][voteIndex] > 3;
+        return votingStatus[msg.sender][voteIndex] >= 3;
     }
 
     function getCurrentVotingStatus(uint256 voteIndex) external view returns(uint256) {
@@ -58,7 +62,7 @@ abstract contract VotingStatusHandling{
 }
 
 
-abstract contract VoteContract is IERC165, RegisterVoteContract, VotingStatusHandling, IVoteContract {
+abstract contract VoteContractPrimitive is IERC165, RegisterVoteContract, VotingStatusHandling, IVoteContract {
 
     mapping(address=>uint256) internal _registeredVotes;
 
@@ -68,7 +72,14 @@ abstract contract VoteContract is IERC165, RegisterVoteContract, VotingStatusHan
 
     // VOTING PRIMITIVES
 
-    function start(bytes memory votingParams) public virtual override(IVoteContract) returns(uint256 voteIndex);
+    function _start(bytes memory votingParams) 
+    internal
+    virtual
+    returns(uint256 voteIndex)
+    {
+        votingParams;  // silence compiler warnings.
+        return 0;
+    }
 
     function vote(uint256 voteIndex, address voter, uint256 option) external virtual override(IVoteContract) returns(uint256 status);
 
@@ -91,9 +102,39 @@ abstract contract VoteContract is IERC165, RegisterVoteContract, VotingStatusHan
     modifier activateNewVote {
         _registeredVotes[msg.sender] += 1;
         _;
-        votingStatus[msg.sender][_registeredVotes[msg.sender]] = uint256(VotingStatus.active);
+        votingStatus[msg.sender][getCurrentVoteIndex(msg.sender)] = uint256(uint8(VotingStatus.active));
     }
     
+}
+
+abstract contract VoteContract is IVoteContract, VoteContractPrimitive {
+    
+    function start(bytes memory votingParams)
+    public
+    override(IVoteContract) 
+    activateNewVote
+    returns(uint256 voteIndex) {
+        voteIndex = _start(votingParams);
+    }
+
+    function _start(bytes memory votingParams) 
+    virtual
+    internal
+    override(VoteContractPrimitive)
+    returns(uint256 voteIndex)
+    {
+        votingParams;  // silence compiler warnings.
+        return 0;
+    }
+
+    function vote(uint256 voteIndex, address voter, uint256 option) external virtual override(IVoteContract, VoteContractPrimitive) returns (uint256 status);
+    
+    function result(uint256 voteIndex) external view virtual override(IVoteContract, VoteContractPrimitive) returns(bytes32 votingResult);
+
+    function condition(uint voteIndex) internal view virtual override(VoteContractPrimitive) returns(bool);
+
+    function statusPermitsVoting(uint256 voteIndex) external view virtual override(IVoteContract, VoteContractPrimitive) returns(bool);
+
 }
 
 abstract contract ImplementCallback {
@@ -110,7 +151,7 @@ abstract contract ImplementCallback {
     }
 }
 
-abstract contract VoteAndImplementContract is IVoteContract, VoteContract, ImplementCallback, IVoteAndImplementContract {
+abstract contract VoteAndImplementContract is IVoteContract, VoteContractPrimitive, ImplementCallback, IVoteAndImplementContract {
 
     mapping(address=>mapping(uint256=>Callback)) internal callback;
 
@@ -122,25 +163,41 @@ abstract contract VoteAndImplementContract is IVoteContract, VoteContract, Imple
         callback[msg.sender][voteIndex].response = _implement(msg.sender, callback[msg.sender][voteIndex]);
     }
 
-    function start(bytes memory votingParams) public virtual override(IVoteContract, VoteContract) returns(uint256 voteIndex) {
+    function _start(bytes memory votingParams) 
+    virtual
+    internal
+    override(VoteContractPrimitive)
+    returns(uint256 voteIndex)
+    {
         votingParams;  // silence compiler warnings.
         return 0;
     }
 
-    function vote(uint256 voteIndex, address voter, uint256 option) external virtual override(IVoteContract, VoteContract) returns (uint256 status);
+    function start(bytes memory votingParams)
+    public
+    override(IVoteContract) 
+    activateNewVote
+    returns(uint256 voteIndex) {
+        voteIndex = _start(votingParams);
+    }
+
+    function vote(uint256 voteIndex, address voter, uint256 option) external virtual override(IVoteContract, VoteContractPrimitive) returns (uint256 status);
     
-    function result(uint256 voteIndex) external view virtual override(IVoteContract, VoteContract) returns(bytes32 votingResult);
+    function result(uint256 voteIndex) external view virtual override(IVoteContract, VoteContractPrimitive) returns(bytes32 votingResult);
 
-    function condition(uint voteIndex) internal view virtual override(VoteContract) returns(bool);
+    function condition(uint voteIndex) internal view virtual override(VoteContractPrimitive) returns(bool);
 
-    function statusPermitsVoting(uint256 voteIndex) external view virtual override(IVoteContract, VoteContract) returns(bool);
+    function statusPermitsVoting(uint256 voteIndex) external view virtual override(IVoteContract, VoteContractPrimitive) returns(bool);
 
     function start(
-        bytes memory _votingParams,
+        bytes memory votingParams,
         bytes4 _callbackSelector,
         bytes memory _callbackArgs)
-    external override(IVoteAndImplementContract) returns(uint256 index) {
-        index = start(_votingParams);
+    external
+    override(IVoteAndImplementContract) 
+    activateNewVote
+    returns(uint256 index) {
+        index = _start(votingParams);
         callback[msg.sender][index] = Callback({
             selector: _callbackSelector,
             arguments: _callbackArgs,
@@ -157,7 +214,7 @@ abstract contract VoteAndImplementContract is IVoteContract, VoteContract, Imple
     }
 
 
-    function supportsInterface(bytes4 interfaceId) public pure virtual override(IERC165, VoteContract) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public pure virtual override(IERC165, VoteContractPrimitive) returns (bool) {
         return 
             super.supportsInterface(interfaceId) ||
             interfaceId == type(IVoteAndImplementContract).interfaceId;

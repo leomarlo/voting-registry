@@ -27,7 +27,7 @@ interface IVoteContract is IERC165{
 
 interface IVoteAndImplementContract is IVoteContract {
     function start(
-        bytes memory _votingParams,
+        bytes memory votingParams,
         bytes4 _callbackSelector,
         bytes memory _callbackArgs)
     external returns(uint256 index); 

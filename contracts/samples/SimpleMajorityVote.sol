@@ -16,6 +16,7 @@ contract SimpleMajorityVote is VoteContract {
     // constructor(bytes8 _categoryId, address _registry)
     // VoteContract(_categoryId, _registry){}
     // constructor()
+    
 
     // // FIXME!! Delete the explicit registration
     // function register(bytes8 _categoryId, address _registry) 
@@ -24,10 +25,9 @@ contract SimpleMajorityVote is VoteContract {
     //     _register(_categoryId, _registry);
     // } 
 
-    function start(bytes memory votingParams) 
-    public 
+    function _start(bytes memory votingParams) 
+    internal 
     override(VoteContract)
-    activateNewVote
     returns(uint256 voteIndex)
     {
         voteIndex = getCurrentVoteIndex(msg.sender);
@@ -60,7 +60,7 @@ contract SimpleMajorityVote is VoteContract {
 
 
     function updateStatus(uint256 voteIndex) internal {
-        votingStatus[msg.sender][voteIndex] = aggregateVotes[msg.sender][voteIndex]==0 ? uint256(VotingStatus.failed) : uint256(VotingStatus.completed);
+        votingStatus[msg.sender][voteIndex] = aggregateVotes[msg.sender][voteIndex]==0 ? uint256(uint8(VotingStatus.failed)) : uint256(uint8(VotingStatus.completed));
     }
 
     function statusPermitsVoting(uint256 voteIndex) view external override(VoteContract) returns(bool) {

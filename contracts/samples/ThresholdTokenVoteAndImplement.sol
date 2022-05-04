@@ -33,14 +33,12 @@ contract ThresholdTokenVoteAndImplement is VoteAndImplementContract {
 
     // constructor(bytes8 _categoryId)
     // VoteAndImplementContract(_categoryId){}
-
     // constructor(bytes8 _categoryId, address _registry)
     // VoteAndImplementContract(_categoryId, _registry){}
 
-    function start(bytes memory votingParams) 
-    public 
+    function _start(bytes memory votingParams) 
+    internal 
     override(VoteAndImplementContract)
-    activateNewVote
     returns(uint256 voteIndex)
     {
         voteIndex = getCurrentVoteIndex(msg.sender);
@@ -91,7 +89,7 @@ contract ThresholdTokenVoteAndImplement is VoteAndImplementContract {
 
     function condition(uint voteIndex) internal view override(VoteAndImplementContract) returns(bool) {
         // check whether deadline is over
-        return block.timestamp <= parameters[msg.sender][voteIndex].deadline;
+        return block.timestamp > parameters[msg.sender][voteIndex].deadline;
     }
 
     function updateStatus(uint256 voteIndex) internal {
@@ -100,7 +98,7 @@ contract ThresholdTokenVoteAndImplement is VoteAndImplementContract {
         uint256 totalVotes = votes[msg.sender][voteIndex].total;
         uint256 currentTokenSupply = parameters[msg.sender][voteIndex].token.totalSupply();
         if (totalVotes < (parameters[msg.sender][voteIndex].quorum * currentTokenSupply) / BASISPOINTS) {
-            votingStatus[msg.sender][voteIndex] = uint256(VotingStatus.failed);
+            votingStatus[msg.sender][voteIndex] = uint256(uint8(VotingStatus.failed));
             return;
         } 
 
@@ -109,7 +107,7 @@ contract ThresholdTokenVoteAndImplement is VoteAndImplementContract {
         bool moreProThanContra = votes[msg.sender][voteIndex].pro > votes[msg.sender][voteIndex].contra;
         // for simplicity lets assume that 
         bool completed = moreProThanContra && (votes[msg.sender][voteIndex].pro >= majorityThreshold);
-        votingStatus[msg.sender][voteIndex] = completed ? uint256(VotingStatus.failed) : uint256(VotingStatus.failed);
+        votingStatus[msg.sender][voteIndex] = completed ? uint256(uint8(VotingStatus.completed)) : uint256(uint8(VotingStatus.failed));
 
     }
 
@@ -129,6 +127,20 @@ contract ThresholdTokenVoteAndImplement is VoteAndImplementContract {
         pro = votes[msg.sender][voteIndex].pro;
         contra = votes[msg.sender][voteIndex].contra;
         abstain = votes[msg.sender][voteIndex].total - (pro + contra);
+    }
+
+    function getTotalVotes(address caller, uint256 voteIndex) external view returns (uint256) {
+        return votes[caller][voteIndex].total;
+    }
+
+    function getVotes(address caller, uint256 voteIndex) external view returns (uint256 pro, uint256 contra, uint256 abstain) {
+        pro = votes[caller][voteIndex].pro;
+        contra = votes[caller][voteIndex].contra;
+        abstain = votes[caller][voteIndex].total - (pro + contra);
+    }
+
+    function getStatus(address caller, uint256 voteIndex) external view returns (uint256) {
+        return votingStatus[caller][voteIndex];
     }
 
     function encodeVotingParams(

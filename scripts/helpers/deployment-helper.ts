@@ -2,8 +2,10 @@ import hre from "hardhat";
 import fs from 'fs';
 
 import {execShellCommand} from './shell'
+import {verifyThisContract} from './verification-helper'
 import { isBytesLike } from "ethers/lib/utils";
 
+let verificationWaitingTime: number = -1; //15000
 
 interface contractPreDeployInfo {
     contractName: string,
@@ -67,7 +69,7 @@ async function deployment(contractName:string, args: Array<any>, registerContrac
 function saveDeploymentArguments(contractName: string, variables: Array<any>) {
     let exportFile: string = 'module.exports = [\n'
     for (let j=0; j<variables.length; j++ ){
-        exportFile += "\t" + variables[j].toString() + ",\n"
+        exportFile += '\t' + variables[j].toString() + ',\n'
     }
     exportFile += ']'
     let fileName = "deploy-vars-" + contractName + ".js"
@@ -138,9 +140,12 @@ async function registerVoteContract(contractName: string, categoryId: string): P
 }
 
 
-async function voteContractDeploymentStack(withRegistry: boolean): Promise<Array<contractInfo>>  {
+async function voteContractDeploymentStack(withRegistry: boolean, verbosity: number): Promise<Array<contractInfo>>  {
 
     let returnInfo: Array<contractInfo> = []
+    let pathToSampleVoteContracts: string = "contracts/samples/"
+    let completePathToContract: string;
+    let newVotecontract: contractInfo; 
 
     let orginalRegistryAddress: string = ""
     if (withRegistry){
@@ -152,17 +157,24 @@ async function voteContractDeploymentStack(withRegistry: boolean): Promise<Array
             shouldBeRegistered: false,
             registrationArgs: []
         }
+        
         let contract: fullContractInfo = await deployment(
             "Registry",
             [],
             registerContract)
         let registryAddress = contract.contractAddress
         saveDeploymentArguments("Registry", [])
-        returnInfo.push({
+        newVotecontract = {
             contractName: "Registry",
             deploymentArguments: [],
-            contractAddress: registryAddress
-        });
+            contractAddress: registryAddress}
+        returnInfo.push(newVotecontract)
+        saveToFile(newVotecontract,`./info/${hre.network.name}/${newVotecontract.contractName}.json`)
+        if (hre.network.name!='localhost'){
+            completePathToContract = pathToSampleVoteContracts + newVotecontract.contractName + '.sol'
+            await verifyThisContract(newVotecontract.contractAddress, newVotecontract.contractName, completePathToContract, verificationWaitingTime)
+        }
+        if (verbosity>=1){console.log("\nContract Info:", newVotecontract, "\n")}
 
         // set globalAddress
         await setGlobalRegistryAddressAndCompile(registryAddress);
@@ -172,34 +184,98 @@ async function voteContractDeploymentStack(withRegistry: boolean): Promise<Array
 
     }
 
-    let newVotecontract: contractInfo; 
+    // if it doesnt work to deploy all this then set the global address back
+    try {
+        let onlyUsedVoteContract: boolean = true;
+        if (!onlyUsedVoteContract){
+            newVotecontract = await registerVoteContract("SimpleMajorityVote", "0x0000000000000001")
+            returnInfo.push(newVotecontract);
+            saveToFile(newVotecontract,`./info/${hre.network.name}/${newVotecontract.contractName}.json`)
+            if (hre.network.name!='localhost'){
+                completePathToContract = pathToSampleVoteContracts + newVotecontract.contractName + '.sol'
+                await verifyThisContract(newVotecontract.contractAddress, newVotecontract.contractName, completePathToContract, verificationWaitingTime)}
+            if (verbosity>=1){console.log("\nContract Info:", newVotecontract, "\n")}
+        
+        
+            newVotecontract = await registerVoteContract("SimpleMajorityVoteAndImplement", "0x0000000000000001")
+            returnInfo.push(newVotecontract);
+            saveToFile(newVotecontract,`./info/${hre.network.name}/${newVotecontract.contractName}.json`)
+            if (hre.network.name!='localhost'){
+                completePathToContract = pathToSampleVoteContracts + newVotecontract.contractName + '.sol'
+                await verifyThisContract(newVotecontract.contractAddress, newVotecontract.contractName, completePathToContract, verificationWaitingTime)
+            }
+            if (verbosity>=1){console.log("\nContract Info:", newVotecontract, "\n")}
 
-    newVotecontract = await registerVoteContract("SimpleMajorityVote", "0x0000000000000001")
-    returnInfo.push(newVotecontract);
-    newVotecontract = await registerVoteContract("SimpleMajorityVoteAndImplement", "0x0000000000000001")
-    returnInfo.push(newVotecontract);
-    newVotecontract = await registerVoteContract("ThresholdTokenVote", "0x0000000000000002")
-    returnInfo.push(newVotecontract);
-    newVotecontract = await registerVoteContract("ThresholdTokenVoteAndImplement", "0x0000000000000002")
-    returnInfo.push(newVotecontract);
-    let thresholdVoteContractAddress: string = newVotecontract.contractAddress;
-   
+            newVotecontract = await registerVoteContract("ThresholdTokenVote", "0x0000000000000002")
+            returnInfo.push(newVotecontract);
+            saveToFile(newVotecontract,`./info/${hre.network.name}/${newVotecontract.contractName}.json`)
+            if (hre.network.name!='localhost'){
+                completePathToContract = pathToSampleVoteContracts + newVotecontract.contractName + '.sol'
+                await verifyThisContract(newVotecontract.contractAddress, newVotecontract.contractName, completePathToContract, verificationWaitingTime)
+            }
+            if (verbosity>=1){console.log("\nContract Info:", newVotecontract, "\n")}
+        }
+        newVotecontract = await registerVoteContract("ThresholdTokenVoteAndImplement", "0x0000000000000002")
+        returnInfo.push(newVotecontract);
+        saveToFile(newVotecontract,`./info/${hre.network.name}/${newVotecontract.contractName}.json`)
+        let thresholdVoteContractAddress: string = newVotecontract.contractAddress;
+        if (hre.network.name!='localhost'){
+            completePathToContract = pathToSampleVoteContracts + newVotecontract.contractName + '.sol'
+            await verifyThisContract(newVotecontract.contractAddress, newVotecontract.contractName, completePathToContract, verificationWaitingTime)
+        }
+        if (verbosity>=1){console.log("\nContract Info:", newVotecontract, "\n")}
+    
+        // deploy dummy token
+        let DummyToken = "DummyERC20"
+        let name = "Dummy ERC20 Token"
+        let symbol = "DUMMY"
+        let deploymentArgs = [name, symbol]
+        let registerContract: RegisterVoteContract = {
+            shouldBeRegistered: false,
+            registrationArgs: []
+        }
+        let contract: fullContractInfo = await deployment(DummyToken, deploymentArgs, registerContract)
+        let dummyTokenAddress: string = contract.contractAddress
+        let newDummyToken: contractInfo = {
+            contractName: DummyToken,
+            deploymentArguments: [`"${name}"`,`"${symbol}"` ],
+            contractAddress: contract.contractAddress}
+        saveDeploymentArguments(DummyToken, newDummyToken.deploymentArguments)
+        returnInfo.push(newDummyToken)
+        saveToFile(newDummyToken,`./info/${hre.network.name}/${newDummyToken.contractName}.json`)
+        if (hre.network.name!='localhost'){
+            let pathToSampleVoteContracts = 'contracts/test/'
+            completePathToContract = pathToSampleVoteContracts + newDummyToken.contractName + '.sol'
+            await verifyThisContract(newDummyToken.contractAddress, newDummyToken.contractName, completePathToContract, verificationWaitingTime)
+        }
+        if (verbosity>=1){console.log("\nContract Info:", newDummyToken, "\n")}
 
-    // deploy dummy integrator
-    let DummyName = "DummyIntegrator"
-    let deploymentArgs = [thresholdVoteContractAddress];
-    let registerContract: RegisterVoteContract = {
-        shouldBeRegistered: false,
-        registrationArgs: []
+        // deploy dummy integrator
+        let DummyName = "DummyIntegrator"
+        deploymentArgs = [thresholdVoteContractAddress, dummyTokenAddress];
+        contract = await deployment(DummyName, deploymentArgs, registerContract)
+        let newDummyContract: contractInfo = {
+            contractName: DummyName,
+            deploymentArguments: [`"${thresholdVoteContractAddress}"`,`"${dummyTokenAddress}"` ],
+            contractAddress: contract.contractAddress}
+        saveDeploymentArguments(DummyName, newDummyContract.deploymentArguments)
+        returnInfo.push(newDummyContract)
+        saveToFile(newDummyContract,`./info/${hre.network.name}/${newDummyContract.contractName}.json`)
+        if (hre.network.name!='localhost'){
+            let pathToSampleVoteContracts = 'contracts/test/'
+            completePathToContract = pathToSampleVoteContracts + newDummyContract.contractName + '.sol'
+            await verifyThisContract(newDummyContract.contractAddress, newDummyContract.contractName, completePathToContract, verificationWaitingTime)
+        }
+        if (verbosity>=1){console.log("\nContract Info:", newDummyContract, "\n")}
+    
+    } catch(err) {
+        if (withRegistry){
+            // replace the old registry address and compile
+            await setGlobalRegistryAddressAndCompile(orginalRegistryAddress);
+        }
+        console.log("Encountered an Error:", err)
     }
-    let contract: fullContractInfo = await deployment(DummyName, deploymentArgs, registerContract)
-    saveDeploymentArguments(DummyName, deploymentArgs)
-    returnInfo.push({
-        contractName: DummyName,
-        deploymentArguments: deploymentArgs,
-        contractAddress: contract.contractAddress
-    });
-
+    
     if (withRegistry){
         // replace the old registry address and compile
         await setGlobalRegistryAddressAndCompile(orginalRegistryAddress);
@@ -208,12 +284,12 @@ async function voteContractDeploymentStack(withRegistry: boolean): Promise<Array
     return returnInfo
 }
 
-async function deployVoteContractStackAndSave(withRegistry: boolean) {
-    let returnInfo: Array<contractInfo> = await voteContractDeploymentStack(withRegistry)
+async function deployVoteContractStackAndSave(withRegistry: boolean, verbosity: number) {
+    let returnInfo: Array<contractInfo> = await voteContractDeploymentStack(withRegistry, verbosity)
     saveToFile(returnInfo,`./info/${hre.network.name}/contracts.json`)
-    for (let i=0; i<returnInfo.length; i++){
-        saveToFile(returnInfo[i],`./info/${hre.network.name}/${returnInfo[i].contractName}.json`)
-    }
+    // for (let i=0; i<returnInfo.length; i++){
+    //     saveToFile(returnInfo[i],`./info/${hre.network.name}/${returnInfo[i].contractName}.json`)
+    // }
 }
 
 async function deployRegistry() : Promise<Array<string>> {
@@ -251,6 +327,7 @@ export {
     retrieveAddressFromRegistryAddressSol,
     deployRegistry,
     saveToFile,
+    delay,
     contractPreDeployInfo
 }
 

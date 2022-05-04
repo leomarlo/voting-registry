@@ -17,7 +17,7 @@ contract RevertConstructor {
 
 contract RevertFunction {
 
-    function fail() external {
+    function fail() external pure {
         require(false, "You failed, even more miserably than before!");
     }
 }

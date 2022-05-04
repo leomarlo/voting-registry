@@ -19,10 +19,9 @@ contract SimpleMajorityVoteAndImplement is VoteAndImplementContract {
     // constructor(bytes8 _categoryId, address _registry)
     // VoteAndImplementContract(_categoryId, _registry){}
 
-    function start(bytes memory votingParams) 
-    public 
+    function _start(bytes memory votingParams) 
+    internal 
     override(VoteAndImplementContract)
-    activateNewVote
     returns(uint256 voteIndex)
     {
         voteIndex = getCurrentVoteIndex(msg.sender);
@@ -58,7 +57,7 @@ contract SimpleMajorityVoteAndImplement is VoteAndImplementContract {
 
     function updateStatus(uint256 voteIndex) internal {
         // only pass the vote when the aggregated votes are larger than zero.
-        votingStatus[msg.sender][voteIndex] = aggregateVotes[msg.sender][voteIndex]>0 ? uint256(VotingStatus.failed) : uint256(VotingStatus.completed);
+        votingStatus[msg.sender][voteIndex] = aggregateVotes[msg.sender][voteIndex]>0 ? uint256(uint8(VotingStatus.failed)) : uint256(uint8(VotingStatus.completed));
     }
 
     function statusPermitsVoting(uint256 voteIndex) view external override(VoteAndImplementContract) returns(bool) {

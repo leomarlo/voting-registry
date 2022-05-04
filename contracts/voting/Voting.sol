@@ -1,5 +1,5 @@
-// //SPDX-License-Identifier: Unlicense
-// pragma solidity ^0.8.4;
+//SPDX-License-Identifier: Unlicense
+pragma solidity ^0.8.4;
 
 // import {IVoting, IGetCurrentIndex} from "./IVoting.sol";
 // import {IVoteContract} from "../voteContract/IVoteContract.sol";

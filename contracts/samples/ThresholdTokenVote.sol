@@ -35,10 +35,9 @@ contract ThresholdTokenVote is VoteContract {
     // constructor(bytes8 _categoryId, address _registry)
     // VoteContract(_categoryId, _registry){}
 
-    function start(bytes memory votingParams) 
-    public 
+    function _start(bytes memory votingParams) 
+    internal 
     override(VoteContract)
-    activateNewVote
     returns(uint256 voteIndex)
     {
         voteIndex = getCurrentVoteIndex(msg.sender);
@@ -98,7 +97,7 @@ contract ThresholdTokenVote is VoteContract {
         uint256 totalVotes = votes[msg.sender][voteIndex].total;
         uint256 currentTokenSupply = parameters[msg.sender][voteIndex].token.totalSupply();
         if (totalVotes < (parameters[msg.sender][voteIndex].quorum * currentTokenSupply) / BASISPOINTS) {
-            votingStatus[msg.sender][voteIndex] = uint256(VotingStatus.failed);
+            votingStatus[msg.sender][voteIndex] = uint256(uint8(VotingStatus.failed));
             return;
         } 
 
@@ -107,7 +106,7 @@ contract ThresholdTokenVote is VoteContract {
         bool moreProThanContra = votes[msg.sender][voteIndex].pro > votes[msg.sender][voteIndex].contra;
         // for simplicity lets assume that 
         bool completed = moreProThanContra && (votes[msg.sender][voteIndex].pro >= majorityThreshold);
-        votingStatus[msg.sender][voteIndex] = completed ? uint256(VotingStatus.failed) : uint256(VotingStatus.failed);
+        votingStatus[msg.sender][voteIndex] = completed ? uint256(uint8(VotingStatus.failed)) : uint256(uint8(VotingStatus.failed));
 
     }
 

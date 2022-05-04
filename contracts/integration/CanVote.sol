@@ -122,26 +122,12 @@ struct VoteInfo {
     uint256 index;
 }
 
-abstract contract CanVote is Whitelisting {
+abstract contract CanVotePrimitive is Whitelisting {
 
     mapping(uint256=>VoteInfo) internal voteInfo;
     uint256 internal totalVotesStarted;
 
     // constructor() Whitelisting(){}
-
-    function _start(bytes4 selector, bytes memory votingParams) 
-    internal
-    isVotable(selector)
-    isWhitelisted(voteContract[selector])
-    returns(uint256)
-    {
-        totalVotesStarted += 1;
-        VoteInfo memory _voteInfo;
-        _voteInfo.voteContract = voteContract[selector];
-        _voteInfo.index = IVoteContract(_voteInfo.voteContract).start(votingParams);
-        voteInfo[totalVotesStarted] = _voteInfo;
-        return totalVotesStarted;
-    }
 
     function getTotalVotesStarted() external view returns(uint256) {
         return totalVotesStarted;
@@ -160,17 +146,45 @@ abstract contract CanVote is Whitelisting {
             msg.sender,
             option
         );
-
     }
 
   
     modifier permitsVoting(uint256 voteIndex){
-        bool permitted = IVoteContract(voteInfo[voteIndex].voteContract)
-            .statusPermitsVoting(voteInfo[voteIndex].index);
+        bool permitted = IVoteContract(voteInfo[voteIndex].voteContract).statusPermitsVoting(voteInfo[voteIndex].index);
         if(! permitted){
             revert DoesNotPermitVoting(voteIndex);
         }
         _;
     }
     
+}
+
+
+abstract contract CanVoteWithoutStarting is CanVotePrimitive {
+
+    // TODO: Actually this function doesnt need a selector, since no function is called upon completion.
+    // TODO: Maybe change the Whitelisting abstract contract to allow for function-unspecific whitelisting of contracts.
+
+    function _start(bytes4 selector, bytes memory votingParams) 
+    internal
+    isVotable(selector)
+    isWhitelisted(voteContract[selector])
+    returns(uint256)
+    {
+        totalVotesStarted += 1;
+        VoteInfo memory _voteInfo;
+        _voteInfo.voteContract = voteContract[selector];
+        _voteInfo.index = IVoteContract(_voteInfo.voteContract).start(votingParams);
+        voteInfo[totalVotesStarted] = _voteInfo;
+        return totalVotesStarted;
+    }
+}
+
+
+abstract contract CanVote is CanVoteWithoutStarting {
+
+    function vote(uint256 voteIndex, uint256 option) public virtual;
+
+    function start(bytes4 selector, bytes memory votingParams) public virtual;
+
 }

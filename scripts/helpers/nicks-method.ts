@@ -137,7 +137,7 @@ async function getQuoteAndNickDeploy(networkName: string, contractName: string, 
 async function getQuoteNickDeployAndVerify(networkName: string, contractName: string, contractPath: string, args: Array<any>, gasPriceInGwei: string) : Promise<txSuccess> {
     let contractDeploymentInfo: txSuccess = await getQuoteAndNickDeploy(networkName, contractName, args, gasPriceInGwei)
     if (contractDeploymentInfo.successFlag && networkName!="localhost"){
-        verifyThisContract(contractDeploymentInfo.contractAddress, contractName, contractPath)
+        verifyThisContract(contractDeploymentInfo.contractAddress, contractName, contractPath, 0)
     }
     return contractDeploymentInfo;
 }

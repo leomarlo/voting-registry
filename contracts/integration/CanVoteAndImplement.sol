@@ -6,23 +6,30 @@ import {REGISTRY} from "../registry/RegistryAddress.sol";
 import {IVotingRegistry} from "../registry/IVotingRegistry.sol";
 import {IVoteContract, Callback, Response} from "../voteContract/IVoteContract.sol";
 import {ImplementCallback} from "../voteContract/VoteContract.sol";
-import {CanVote, Whitelisting, FunctionGuard} from "./CanVote.sol";
+import {CanVoteWithoutStarting, CanVotePrimitive, Whitelisting, FunctionGuard} from "./CanVote.sol";
 
 
-abstract contract CanVoteAndImplement is Whitelisting, ImplementCallback, FunctionGuard, CanVote {
+abstract contract CanVoteAndImplement is Whitelisting, ImplementCallback, FunctionGuard, CanVoteWithoutStarting {
 
     mapping(uint256=>Callback) internal callback;
 
     // constructor() CanVote(){}
-
-     function _start(
-        bytes memory _votingParams,
+    function start(
+        bytes memory votingParams,
         bytes4 _callbackSelector,
         bytes memory _callbackArgs)
-    external 
+    public virtual; 
+
+    function vote(uint256 voteIndex, uint256 option) public virtual;
+
+    function _start(
+        bytes memory votingParams,
+        bytes4 _callbackSelector,
+        bytes memory _callbackArgs)
+    internal 
     returns(uint256 index) 
     {
-        index = _start(_callbackSelector, _votingParams);
+        index = _start(_callbackSelector, votingParams);
         callback[index] = Callback({
             selector: _callbackSelector,
             arguments: _callbackArgs,
