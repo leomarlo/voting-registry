@@ -1,4 +1,4 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
-address constant REGISTRY = 0xbC9BFE2CA9a27A34Bfc2057b428c7C341a017a2f;
+address constant REGISTRY = 0x5354453d6FA8a3A285aBe7B7b34dadC70AE1a2Fc;

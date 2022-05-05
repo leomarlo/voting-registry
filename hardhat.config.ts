@@ -22,6 +22,17 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
+function setAccounts(): Array<string> {
+  const array :Array<string> = []
+  if (process.env.ALICE_PK !== undefined) {
+    array.push(process.env.ALICE_PK)
+  } 
+  if (process.env.BOB_PK !== undefined) {
+    array.push(process.env.BOB_PK)
+  } 
+  return array;
+}
+
 let defaultNetwork: string = "rinkeby"
 const config: HardhatUserConfig = {
   solidity: "0.8.4",
@@ -29,16 +40,28 @@ const config: HardhatUserConfig = {
   networks: {
     rinkeby: {
       url: process.env.RINKEBY_URL || "",
-      accounts: process.env.ALICE_PK !== undefined ? [process.env.ALICE_PK] : [],
+      accounts: setAccounts(),
     },
     localhost: {
       url: process.env.LOCALHOST + ":" + process.env.PORT,
-      accounts: process.env.ALICE_PK !== undefined ? [process.env.ALICE_PK] : [],
+      accounts: setAccounts(),
     },
     mumbai: {
-      url: process.env.MUMBAI_RPC_ENDPOINT,
-      accounts: process.env.ALICE_PK !== undefined ? [process.env.ALICE_PK] : [],
+      url: process.env.MUMBAI_RPC_ENDPOINT || "",
+      accounts: setAccounts(),
     },
+    ropsten: {
+      url: process.env.ROPSTEN_RPC_ENDPOINT || "",
+      accounts: setAccounts(),
+    },
+    kovan: {
+      url: process.env.KOVAN_RPC_ENDPOINT || "",
+      accounts: setAccounts(),
+    },
+    goerli: {
+      url: process.env.GOERLI_RPC_ENDPOINT || "",
+      accounts: setAccounts(),
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

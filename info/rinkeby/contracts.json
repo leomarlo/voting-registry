@@ -2,7 +2,7 @@
   {
     "contractName": "ThresholdTokenVoteAndImplement",
     "deploymentArguments": [],
-    "contractAddress": "0x7B9e1a9a9693EF392E976F723a0Ef47b9136Cc26"
+    "contractAddress": "0x0Ee041F89B9F2541E459E6d95EDd0AE4311dAC7F"
   },
   {
     "contractName": "DummyERC20",
@@ -10,14 +10,14 @@
       "\"Dummy ERC20 Token\"",
       "\"DUMMY\""
     ],
-    "contractAddress": "0x5E5c73a04d6B1135a9b31f61646db07C1fD75eFe"
+    "contractAddress": "0x5106fc69680eE5d71AFf0d06036eC92e38921Fc0"
   },
   {
     "contractName": "DummyIntegrator",
     "deploymentArguments": [
-      "\"0x7B9e1a9a9693EF392E976F723a0Ef47b9136Cc26\"",
-      "\"0x5E5c73a04d6B1135a9b31f61646db07C1fD75eFe\""
+      "\"0x0Ee041F89B9F2541E459E6d95EDd0AE4311dAC7F\"",
+      "\"0x5106fc69680eE5d71AFf0d06036eC92e38921Fc0\""
     ],
-    "contractAddress": "0xA15CA454b9E70d38D2795D6Ebfb60Cc1E0E80BbF"
+    "contractAddress": "0xa3ED2D71315589c7d29ab08231D0BCa957b5abd8"
   }
 ]

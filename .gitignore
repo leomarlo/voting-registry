@@ -11,3 +11,6 @@ artifacts
 #Localhost files
 scripts/verification/localhost*
 info/localhost*
+
+# notes
+NotesOnTalk.txt

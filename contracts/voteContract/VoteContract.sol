@@ -49,7 +49,7 @@ abstract contract VotingStatusHandling{
         return votingStatus[msg.sender][voteIndex] >= 3;
     }
 
-    function getCurrentVotingStatus(uint256 voteIndex) external view returns(uint256) {
+    function getCurrentVotingStatus(uint256 voteIndex) public view returns(uint256) {
         return votingStatus[msg.sender][voteIndex];
     }
 

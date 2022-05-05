@@ -328,7 +328,10 @@ export {
     deployRegistry,
     saveToFile,
     delay,
-    contractPreDeployInfo
+    deployment,
+    contractPreDeployInfo,
+    fullContractInfo,
+    RegisterVoteContract,
 }
 
 

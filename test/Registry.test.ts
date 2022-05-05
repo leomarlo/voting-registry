@@ -10,7 +10,6 @@ import {
 
 interface Contracts {
     Registry: Registry,
-
 }
 
 async function deployContracts(): Promise<Contracts> {
@@ -40,9 +39,9 @@ describe("Registry", async function () {
             const SimpleMajorityVote = await ethers.getContractFactory("SimpleMajorityVote");
             console.log("registry Address", contracts.Registry.address)
 
-            const simpleMajorityVote = await SimpleMajorityVote.deploy("0x0000000000000000", contracts.Registry.address)
+            const simpleMajorityVote = await SimpleMajorityVote.deploy("0x0000000000000001")
             console.log("deployment tx", simpleMajorityVote)
-            let tx = await simpleMajorityVote.register("0x0000000000000000", contracts.Registry.address)
+            let tx = await simpleMajorityVote.register("0x0000000000000001")
             console.log('tx', tx)
             let number = await contracts.Registry.numberOfRegistrations()
             console.log("registration count", number.toString())

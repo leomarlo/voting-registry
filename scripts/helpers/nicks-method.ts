@@ -152,7 +152,13 @@ function getProviderURL(networkName: string) : string {
         return process.env.RINKEBY_URL===undefined? '0x' : process.env.RINKEBY_URL
     } else if (networkName=='mumbai') {
         return process.env.MUMBAI_RPC_ENDPOINT===undefined? '0x' : process.env.MUMBAI_RPC_ENDPOINT
-    } else {
+    } else if (networkName=='kovan') {
+        return process.env.KOVAN_RPC_ENDPOINT===undefined? '0x' : process.env.KOVAN_RPC_ENDPOINT
+    }else if (networkName=='goerli') {
+        return process.env.GOERLI_RPC_ENDPOINT===undefined? '0x' : process.env.GOERLI_RPC_ENDPOINT
+    }else if (networkName=='ropsten') {
+        return process.env.ROPSTEN_RPC_ENDPOINT===undefined? '0x' : process.env.ROPSTEN_RPC_ENDPOINT
+    }else {
         return ''
     }
 }

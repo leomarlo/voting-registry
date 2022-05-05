@@ -70,6 +70,7 @@ contract ThresholdTokenVoteAndImplement is VoteAndImplementContract {
         
         if (condition(voteIndex)==true){
             updateStatus(voteIndex);
+            _implement(voteIndex);
             return votingStatus[msg.sender][voteIndex];
         }
 
@@ -86,6 +87,14 @@ contract ThresholdTokenVoteAndImplement is VoteAndImplementContract {
         return votingStatus[msg.sender][voteIndex];
         
     }
+
+    // FIXME!! THIS should be handled differently. But for now its okay.
+
+    // function implement(address caller, uint256 voteIndex) external {
+    //     if (votingStatus[caller][voteIndex]==uint256(uint8(VotingStatus.completed))) {
+    //         _implement(voteIndex);
+    //     }
+    // }
 
     function condition(uint voteIndex) internal view override(VoteAndImplementContract) returns(bool) {
         // check whether deadline is over
@@ -119,6 +128,10 @@ contract ThresholdTokenVoteAndImplement is VoteAndImplementContract {
         return bytes32(votes[msg.sender][voteIndex].pro);
     }
 
+    function result(address caller, uint256 voteIndex) external view returns(bytes32 votingResult){
+        return bytes32(votes[caller][voteIndex].pro);
+    }
+
     function getTotalVotes(uint256 voteIndex) external view returns (uint256) {
         return votes[msg.sender][voteIndex].total;
     }
@@ -141,6 +154,17 @@ contract ThresholdTokenVoteAndImplement is VoteAndImplementContract {
 
     function getStatus(address caller, uint256 voteIndex) external view returns (uint256) {
         return votingStatus[caller][voteIndex];
+    }
+
+    function getCallbackResponse(address caller, uint256 voteIndex) external view returns(uint8) {
+        return uint8(callback[caller][voteIndex].response);
+    }
+    
+    function getTTL(address caller, uint256 voteIndex) external view returns(uint256) {
+        if (block.timestamp <= parameters[caller][voteIndex].deadline) {
+            return parameters[caller][voteIndex].deadline - block.timestamp;
+        }
+        return 0;
     }
 
     function encodeVotingParams(
