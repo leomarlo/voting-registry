@@ -1,0 +1,16 @@
+{
+    "methods": {},
+    "events": {},
+    "errors": {
+        "ReversionOfConstructor": {
+            "code": "error ReversionOfConstructor(address deployer)",
+            "inputs": {
+                "deployer": {
+                    "type": "address"
+                }
+            }
+        }
+    },
+    "path": "/test",
+    "name": "RevertConstructor"
+}

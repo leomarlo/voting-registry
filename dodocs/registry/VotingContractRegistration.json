@@ -1,0 +1,46 @@
+{
+    "methods": {
+        "getRegistrationIndex(address)": {
+            "stateMutability": "view",
+            "code": "function getRegistrationIndex(address votingContract) external view returns (uint256)",
+            "inputs": {
+                "votingContract": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "isRegistered(address)": {
+            "stateMutability": "view",
+            "code": "function isRegistered(address votingContract) external view returns (bool)",
+            "inputs": {
+                "votingContract": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "numberOfRegistrations()": {
+            "stateMutability": "view",
+            "code": "function numberOfRegistrations() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/registry",
+    "name": "VotingContractRegistration"
+}

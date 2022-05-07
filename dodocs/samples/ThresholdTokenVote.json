@@ -1,0 +1,247 @@
+{
+    "methods": {
+        "categories(uint256)": {
+            "stateMutability": "view",
+            "code": "function categories(uint256) external view returns (bytes8)",
+            "inputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes8"
+                }
+            }
+        },
+        "decodeVotingParams(bytes)": {
+            "stateMutability": "pure",
+            "code": "function decodeVotingParams(bytes votingParams) external pure returns (uint256 quorum, uint256 thresholdInBasisPoints, uint256 duration, address tokenAddress)",
+            "inputs": {
+                "votingParams": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "quorum": {
+                    "type": "uint256"
+                },
+                "thresholdInBasisPoints": {
+                    "type": "uint256"
+                },
+                "duration": {
+                    "type": "uint256"
+                },
+                "tokenAddress": {
+                    "type": "address"
+                }
+            }
+        },
+        "encodeVotingParams(uint256,uint256,uint256,address)": {
+            "stateMutability": "pure",
+            "code": "function encodeVotingParams(uint256 quorum, uint256 threshold, uint256 duration, address tokenAddress) external pure returns (bytes)",
+            "inputs": {
+                "quorum": {
+                    "type": "uint256"
+                },
+                "threshold": {
+                    "type": "uint256"
+                },
+                "duration": {
+                    "type": "uint256"
+                },
+                "tokenAddress": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes"
+                }
+            }
+        },
+        "getCurrentVoteIndex(address)": {
+            "stateMutability": "view",
+            "code": "function getCurrentVoteIndex(address caller) external view returns (uint256)",
+            "inputs": {
+                "caller": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "getCurrentVotingStatus(uint256)": {
+            "stateMutability": "view",
+            "code": "function getCurrentVotingStatus(uint256 voteIndex) external view returns (uint256)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "getTotalVotes(uint256)": {
+            "stateMutability": "view",
+            "code": "function getTotalVotes(uint256 voteIndex) external view returns (uint256)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "getVotes(uint256)": {
+            "stateMutability": "view",
+            "code": "function getVotes(uint256 voteIndex) external view returns (uint256 pro, uint256 contra, uint256 abstain)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "pro": {
+                    "type": "uint256"
+                },
+                "contra": {
+                    "type": "uint256"
+                },
+                "abstain": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "register(bytes8)": {
+            "stateMutability": "nonpayable",
+            "code": "function register(bytes8 categoryId) external nonpayable",
+            "inputs": {
+                "categoryId": {
+                    "type": "bytes8"
+                }
+            },
+            "outputs": {}
+        },
+        "result(uint256)": {
+            "stateMutability": "view",
+            "code": "function result(uint256 voteIndex) external view returns (bytes32 votingResult)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "votingResult": {
+                    "type": "bytes32"
+                }
+            }
+        },
+        "start(bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function start(bytes votingParams) external nonpayable returns (uint256 voteIndex)",
+            "inputs": {
+                "votingParams": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "statusPermitsVoting(uint256)": {
+            "stateMutability": "view",
+            "code": "function statusPermitsVoting(uint256 voteIndex) external view returns (bool)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "supportsInterface(bytes4)": {
+            "stateMutability": "pure",
+            "code": "function supportsInterface(bytes4 interfaceId) external pure returns (bool)",
+            "inputs": {
+                "interfaceId": {
+                    "type": "bytes4"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "vote(uint256,address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function vote(uint256 voteIndex, address voter, uint256 option) external nonpayable returns (uint256)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                },
+                "voter": {
+                    "type": "address"
+                },
+                "option": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {
+        "AlreadyVoted": {
+            "code": "error AlreadyVoted(address voter)",
+            "inputs": {
+                "voter": {
+                    "type": "address"
+                }
+            }
+        },
+        "MayOnlyRegisterOnceByDeployer": {
+            "code": "error MayOnlyRegisterOnceByDeployer(address caller, bytes8 categoryId)",
+            "inputs": {
+                "caller": {
+                    "type": "address"
+                },
+                "categoryId": {
+                    "type": "bytes8"
+                }
+            }
+        },
+        "StatusPermitsVoting": {
+            "code": "error StatusPermitsVoting(address caller, uint256 voteIndex)",
+            "inputs": {
+                "caller": {
+                    "type": "address"
+                },
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            }
+        }
+    },
+    "path": "/samples",
+    "name": "ThresholdTokenVote"
+}

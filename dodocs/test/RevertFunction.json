@@ -1,0 +1,14 @@
+{
+    "methods": {
+        "fail()": {
+            "stateMutability": "pure",
+            "code": "function fail() external pure",
+            "inputs": {},
+            "outputs": {}
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/test",
+    "name": "RevertFunction"
+}

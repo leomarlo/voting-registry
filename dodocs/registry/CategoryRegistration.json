@@ -1,0 +1,46 @@
+{
+    "methods": {
+        "getNumberOfRegisteredCategories()": {
+            "stateMutability": "view",
+            "code": "function getNumberOfRegisteredCategories() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "getRegisteredCategoryFromIndex(uint256)": {
+            "stateMutability": "view",
+            "code": "function getRegisteredCategoryFromIndex(uint256 index) external view returns (bytes8)",
+            "inputs": {
+                "index": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes8"
+                }
+            }
+        },
+        "isRegisteredCategory(bytes8)": {
+            "stateMutability": "view",
+            "code": "function isRegisteredCategory(bytes8 category) external view returns (bool)",
+            "inputs": {
+                "category": {
+                    "type": "bytes8"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/registry",
+    "name": "CategoryRegistration"
+}

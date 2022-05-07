@@ -1,0 +1,190 @@
+{
+    "methods": {
+        "changeOwner(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function changeOwner(address newOwner) external nonpayable",
+            "inputs": {
+                "newOwner": {
+                    "type": "address"
+                }
+            },
+            "outputs": {}
+        },
+        "changeOwnerSelector()": {
+            "stateMutability": "view",
+            "code": "function changeOwnerSelector() external view returns (bytes4)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bytes4"
+                }
+            }
+        },
+        "changeSomeoneElse(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function changeSomeoneElse(address newSomeoneElse) external nonpayable",
+            "inputs": {
+                "newSomeoneElse": {
+                    "type": "address"
+                }
+            },
+            "outputs": {}
+        },
+        "changeSomeoneElseSelector()": {
+            "stateMutability": "view",
+            "code": "function changeSomeoneElseSelector() external view returns (bytes4)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bytes4"
+                }
+            }
+        },
+        "dummyERC20()": {
+            "stateMutability": "view",
+            "code": "function dummyERC20() external view returns (contract IERC20)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "contract IERC20"
+                }
+            }
+        },
+        "getTotalVotesStarted()": {
+            "stateMutability": "view",
+            "code": "function getTotalVotesStarted() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "getVoteInfo(uint256)": {
+            "stateMutability": "view",
+            "code": "function getVoteInfo(uint256 voteIndex) external view returns (address, uint256)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "getVotingContract(bytes4)": {
+            "stateMutability": "view",
+            "code": "function getVotingContract(bytes4 selector) external view returns (address)",
+            "inputs": {
+                "selector": {
+                    "type": "bytes4"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "owner()": {
+            "stateMutability": "view",
+            "code": "function owner() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "someoneElse()": {
+            "stateMutability": "view",
+            "code": "function someoneElse() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "start(bytes,bytes4,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function start(bytes votingParams, bytes4 _callbackSelector, bytes _callbackArgs) external nonpayable",
+            "inputs": {
+                "votingParams": {
+                    "type": "bytes"
+                },
+                "_callbackSelector": {
+                    "type": "bytes4"
+                },
+                "_callbackArgs": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {},
+            "notice": "Needs to be defined in order to allow voting"
+        },
+        "vote(uint256,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function vote(uint256 voteIndex, uint256 option) external nonpayable",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                },
+                "option": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {}
+        }
+    },
+    "events": {},
+    "errors": {
+        "DoesNotPermitVoting": {
+            "code": "error DoesNotPermitVoting(uint256 voteIndex)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "FunctionDoesntPermitVoting": {
+            "code": "error FunctionDoesntPermitVoting(bytes4 selector)",
+            "inputs": {
+                "selector": {
+                    "type": "bytes4"
+                }
+            }
+        },
+        "IsNotWhitelistedVoteContract": {
+            "code": "error IsNotWhitelistedVoteContract(address voteContract)",
+            "inputs": {
+                "voteContract": {
+                    "type": "address"
+                }
+            }
+        },
+        "MayNotCallFunction": {
+            "code": "error MayNotCallFunction(address caller)",
+            "inputs": {
+                "caller": {
+                    "type": "address"
+                }
+            }
+        },
+        "NotRegisteredVoteContract": {
+            "code": "error NotRegisteredVoteContract(address voteContract)",
+            "inputs": {
+                "voteContract": {
+                    "type": "address"
+                }
+            }
+        }
+    },
+    "path": "/test",
+    "name": "DummyIntegrator"
+}

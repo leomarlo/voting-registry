@@ -9,6 +9,13 @@ interface IDummyERC20 {
     function freeMinting(uint256 amount) external;
 }
 
+/**
+ * @title A dummy ERC20 token contract
+ * @author Leonhard Horstmeyer
+ * @notice You can free mint yourself some tokens
+ * @dev This is intended for testing purposes only
+ */
+ 
 contract DummyERC20 is ERC20 {
 
     bool public isDummy;

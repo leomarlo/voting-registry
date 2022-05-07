@@ -1,0 +1,60 @@
+{
+    "methods": {
+        "addCategoryToRegistration(bytes8)": {
+            "stateMutability": "nonpayable",
+            "code": "function addCategoryToRegistration(bytes8 categoryId) external nonpayable",
+            "inputs": {
+                "categoryId": {
+                    "type": "bytes8"
+                }
+            },
+            "outputs": {}
+        },
+        "isRegistered(address)": {
+            "stateMutability": "view",
+            "code": "function isRegistered(address voteContract) external view returns (bool registrationFlag)",
+            "inputs": {
+                "voteContract": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "registrationFlag": {
+                    "type": "bool"
+                }
+            }
+        },
+        "isRegisteredCategory(bytes8)": {
+            "stateMutability": "view",
+            "code": "function isRegisteredCategory(bytes8 categoryId) external view returns (bool registrationFlag)",
+            "inputs": {
+                "categoryId": {
+                    "type": "bytes8"
+                }
+            },
+            "outputs": {
+                "registrationFlag": {
+                    "type": "bool"
+                }
+            }
+        },
+        "register(bytes8)": {
+            "stateMutability": "nonpayable",
+            "code": "function register(bytes8 categoryId) external nonpayable returns (uint256 registrationIndex)",
+            "inputs": {
+                "categoryId": {
+                    "type": "bytes8"
+                }
+            },
+            "outputs": {
+                "registrationIndex": {
+                    "type": "uint256"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/registry",
+    "name": "IVotingRegistry"
+}

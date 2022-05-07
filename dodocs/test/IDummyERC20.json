@@ -1,0 +1,18 @@
+{
+    "methods": {
+        "freeMinting(uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function freeMinting(uint256 amount) external nonpayable",
+            "inputs": {
+                "amount": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {}
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/test",
+    "name": "IDummyERC20"
+}

@@ -1,0 +1,125 @@
+{
+    "methods": {
+        "check(uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function check(uint256 index) external nonpayable returns (bool)",
+            "inputs": {
+                "index": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "getCurrentIndex()": {
+            "stateMutability": "nonpayable",
+            "code": "function getCurrentIndex() external nonpayable returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "pause(uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function pause(uint256 index) external nonpayable returns (bool)",
+            "inputs": {
+                "index": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "queryInitializer(uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function queryInitializer(uint256 index) external nonpayable returns (address)",
+            "inputs": {
+                "index": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "queryResult(uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function queryResult(uint256 index) external nonpayable returns (bytes)",
+            "inputs": {
+                "index": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes"
+                }
+            }
+        },
+        "resume(uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function resume(uint256 index) external nonpayable returns (bool)",
+            "inputs": {
+                "index": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "start(bytes4,bytes,bytes4,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function start(bytes4 votingId, bytes votingParams, bytes4 callbackId, bytes callbackParams) external nonpayable returns (uint256 index)",
+            "inputs": {
+                "votingId": {
+                    "type": "bytes4"
+                },
+                "votingParams": {
+                    "type": "bytes"
+                },
+                "callbackId": {
+                    "type": "bytes4"
+                },
+                "callbackParams": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "index": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "stop(uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function stop(uint256 index) external nonpayable returns (bool)",
+            "inputs": {
+                "index": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/voting",
+    "name": "IVoting"
+}

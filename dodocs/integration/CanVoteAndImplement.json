@@ -1,0 +1,64 @@
+{
+    "methods": {
+        "getTotalVotesStarted()": {
+            "stateMutability": "view",
+            "code": "function getTotalVotesStarted() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "getVoteInfo(uint256)": {
+            "stateMutability": "view",
+            "code": "function getVoteInfo(uint256 voteIndex) external view returns (address, uint256)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "start(bytes,bytes4,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function start(bytes votingParams, bytes4 _callbackSelector, bytes _callbackArgs) external nonpayable",
+            "inputs": {
+                "votingParams": {
+                    "type": "bytes"
+                },
+                "_callbackSelector": {
+                    "type": "bytes4"
+                },
+                "_callbackArgs": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {}
+        },
+        "vote(uint256,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function vote(uint256 voteIndex, uint256 option) external nonpayable",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                },
+                "option": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {}
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/integration",
+    "name": "CanVoteAndImplement"
+}
