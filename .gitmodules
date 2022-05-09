@@ -1,0 +1,3 @@
+[submodule "contracts/registration"]
+	path = contracts/registration
+	url = https://github.com/leomarlo/voting-registry-contracts.git
