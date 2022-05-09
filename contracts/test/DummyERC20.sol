@@ -25,8 +25,12 @@ contract DummyERC20 is ERC20 {
         isDummy = true;
     }
 
-    function freeMinting(uint256 amount) external {
+    /**
+     * @dev Allows minting up to a certain amount
+     */
+    function freeMinting(uint256 amount) external returns(bool bbb){
         _mint(msg.sender, amount);
         require(balanceOf(msg.sender)<=MAX_BALANCE, "may not mint beyond 1000 Dummies");
+        return true;
     }
 }

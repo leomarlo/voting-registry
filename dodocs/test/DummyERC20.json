@@ -82,13 +82,21 @@
         },
         "freeMinting(uint256)": {
             "stateMutability": "nonpayable",
-            "code": "function freeMinting(uint256 amount) external nonpayable",
+            "code": "function freeMinting(uint256 amount) external nonpayable returns (bool bbb)",
             "inputs": {
                 "amount": {
-                    "type": "uint256"
+                    "type": "uint256",
+                    "description": "The number of rings from dendrochronological sample"
                 }
             },
-            "outputs": {}
+            "outputs": {
+                "bbb": {
+                    "type": "bool",
+                    "description": "bbb useless"
+                }
+            },
+            "notice": "Free Minting of Dummy tokens",
+            "details": "Only allows minting up to a certain amount"
         },
         "increaseAllowance(address,uint256)": {
             "stateMutability": "nonpayable",

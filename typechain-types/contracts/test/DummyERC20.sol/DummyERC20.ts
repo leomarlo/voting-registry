@@ -319,7 +319,10 @@ export interface DummyERC20 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    freeMinting(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    freeMinting(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     increaseAllowance(
       spender: string,
