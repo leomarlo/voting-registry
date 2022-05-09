@@ -1,0 +1,50 @@
+{
+    "methods": {
+        "getRegistrationIndex(address)": {
+            "stateMutability": "view",
+            "code": "function getRegistrationIndex(address votingContract) external view returns (uint256)",
+            "inputs": {
+                "votingContract": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "isRegistered(address)": {
+            "stateMutability": "view",
+            "code": "function isRegistered(address votingContract) external view returns (bool _isRegistered)",
+            "inputs": {
+                "votingContract": {
+                    "type": "address",
+                    "description": "The address of the contract"
+                }
+            },
+            "outputs": {
+                "_isRegistered": {
+                    "type": "bool",
+                    "description": "The boolean flag that is raised when          the contract is registered"
+                }
+            },
+            "details": "Checks whether contract is registered"
+        },
+        "numberOfRegistrations()": {
+            "stateMutability": "view",
+            "code": "function numberOfRegistrations() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/registration/registry",
+    "notice": "This abstract contract handles just the registration and needs to be inherited by the registry",
+    "name": "VotingContractRegistration"
+}

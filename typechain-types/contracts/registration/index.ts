@@ -3,15 +3,7 @@
 /* eslint-disable */
 import type * as integration from "./integration";
 export type { integration };
-import type * as registration from "./registration";
-export type { registration };
 import type * as registry from "./registry";
 export type { registry };
-import type * as samples from "./samples";
-export type { samples };
-import type * as test from "./test";
-export type { test };
 import type * as voteContract from "./voteContract";
 export type { voteContract };
-import type * as voting from "./voting";
-export type { voting };

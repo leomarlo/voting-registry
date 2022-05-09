@@ -1,0 +1,35 @@
+{
+    "methods": {
+        "getTotalVotesStarted()": {
+            "stateMutability": "view",
+            "code": "function getTotalVotesStarted() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "getVoteInfo(uint256)": {
+            "stateMutability": "view",
+            "code": "function getVoteInfo(uint256 voteIndex) external view returns (address, uint256)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "uint256"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/registration/integration",
+    "name": "CanVotePrimitive"
+}

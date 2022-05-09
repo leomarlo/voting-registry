@@ -1,0 +1,130 @@
+{
+    "methods": {
+        "addCategoryToRegistration(bytes8)": {
+            "stateMutability": "nonpayable",
+            "code": "function addCategoryToRegistration(bytes8 categoryId) external nonpayable",
+            "inputs": {
+                "categoryId": {
+                    "type": "bytes8"
+                }
+            },
+            "outputs": {}
+        },
+        "getNumberOfRegisteredCategories()": {
+            "stateMutability": "view",
+            "code": "function getNumberOfRegisteredCategories() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "getRegisteredCategoryFromIndex(uint256)": {
+            "stateMutability": "view",
+            "code": "function getRegisteredCategoryFromIndex(uint256 index) external view returns (bytes8)",
+            "inputs": {
+                "index": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes8"
+                }
+            }
+        },
+        "getRegistrationIndex(address)": {
+            "stateMutability": "view",
+            "code": "function getRegistrationIndex(address votingContract) external view returns (uint256)",
+            "inputs": {
+                "votingContract": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "isRegistered(address)": {
+            "stateMutability": "view",
+            "code": "function isRegistered(address votingContract) external view returns (bool _isRegistered)",
+            "inputs": {
+                "votingContract": {
+                    "type": "address",
+                    "description": "The address of the contract"
+                }
+            },
+            "outputs": {
+                "_isRegistered": {
+                    "type": "bool",
+                    "description": "The boolean flag that is raised when          the contract is registered"
+                }
+            },
+            "details": "Checks whether contract is registered"
+        },
+        "isRegisteredCategory(bytes8)": {
+            "stateMutability": "view",
+            "code": "function isRegisteredCategory(bytes8 category) external view returns (bool)",
+            "inputs": {
+                "category": {
+                    "type": "bytes8"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "numberOfRegistrations()": {
+            "stateMutability": "view",
+            "code": "function numberOfRegistrations() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "register(bytes8)": {
+            "stateMutability": "nonpayable",
+            "code": "function register(bytes8 _categoryId) external nonpayable returns (uint256 registrationIndex)",
+            "inputs": {
+                "_categoryId": {
+                    "type": "bytes8"
+                }
+            },
+            "outputs": {
+                "registrationIndex": {
+                    "type": "uint256"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {
+        "AlreadyRegistered": {
+            "code": "error AlreadyRegistered(address contractSeekingRegistration)",
+            "inputs": {
+                "contractSeekingRegistration": {
+                    "type": "address"
+                }
+            }
+        },
+        "NotRegistered": {
+            "code": "error NotRegistered(address notRegisteredContract)",
+            "inputs": {
+                "notRegisteredContract": {
+                    "type": "address"
+                }
+            }
+        }
+    },
+    "path": "/registration/registry",
+    "title": "Voting Registry - An on-chain regitry for voting contracts that fulfil interface conditions",
+    "author": "Leonhard Horstmeyer <leonhard.horstmeyer@gmail.com>",
+    "name": "Registry"
+}

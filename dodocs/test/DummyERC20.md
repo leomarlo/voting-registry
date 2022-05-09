@@ -124,21 +124,21 @@ function decreaseAllowance(address spender, uint256 subtractedValue) external no
 function freeMinting(uint256 amount) external nonpayable returns (bool bbb)
 ```
 
-Free Minting of Dummy tokens
 
-*Only allows minting up to a certain amount*
+
+*Allows minting up to a certain amount*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| amount | uint256 | The number of rings from dendrochronological sample |
+| amount | uint256 | undefined |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| bbb | bool | bbb useless |
+| bbb | bool | undefined |
 
 ### increaseAllowance
 

@@ -1,0 +1,59 @@
+{
+    "methods": {
+        "categories(uint256)": {
+            "stateMutability": "view",
+            "code": "function categories(uint256) external view returns (bytes8)",
+            "inputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes8"
+                }
+            }
+        },
+        "register(bytes8)": {
+            "stateMutability": "nonpayable",
+            "code": "function register(bytes8 categoryId) external nonpayable",
+            "inputs": {
+                "categoryId": {
+                    "type": "bytes8"
+                }
+            },
+            "outputs": {}
+        },
+        "supportsInterface(bytes4)": {
+            "stateMutability": "pure",
+            "code": "function supportsInterface(bytes4 interfaceId) external pure returns (bool)",
+            "inputs": {
+                "interfaceId": {
+                    "type": "bytes4"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "details": "Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas."
+        }
+    },
+    "events": {},
+    "errors": {
+        "MayOnlyRegisterOnceByDeployer": {
+            "code": "error MayOnlyRegisterOnceByDeployer(address caller, bytes8 categoryId)",
+            "inputs": {
+                "caller": {
+                    "type": "address"
+                },
+                "categoryId": {
+                    "type": "bytes8"
+                }
+            }
+        }
+    },
+    "path": "/registration/voteContract",
+    "name": "RegisterVoteContract"
+}

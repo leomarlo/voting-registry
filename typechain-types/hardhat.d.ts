@@ -69,6 +69,70 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.CanVoteAndImplement__factory>;
     getContractFactory(
+      name: "CanVote",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CanVote__factory>;
+    getContractFactory(
+      name: "CanVotePrimitive",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CanVotePrimitive__factory>;
+    getContractFactory(
+      name: "CanVoteWithoutStarting",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CanVoteWithoutStarting__factory>;
+    getContractFactory(
+      name: "CanVoteAndDelegateImplement",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CanVoteAndDelegateImplement__factory>;
+    getContractFactory(
+      name: "CanVoteAndImplement",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CanVoteAndImplement__factory>;
+    getContractFactory(
+      name: "IVotingRegistry",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVotingRegistry__factory>;
+    getContractFactory(
+      name: "CategoryRegistration",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CategoryRegistration__factory>;
+    getContractFactory(
+      name: "Registry",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Registry__factory>;
+    getContractFactory(
+      name: "VotingContractRegistration",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VotingContractRegistration__factory>;
+    getContractFactory(
+      name: "IVoteAndImplementContract",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVoteAndImplementContract__factory>;
+    getContractFactory(
+      name: "IVoteContract",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVoteContract__factory>;
+    getContractFactory(
+      name: "RegisterVoteContract",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RegisterVoteContract__factory>;
+    getContractFactory(
+      name: "VoteAndImplementContract",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VoteAndImplementContract__factory>;
+    getContractFactory(
+      name: "VoteContract",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VoteContract__factory>;
+    getContractFactory(
+      name: "VoteContractPrimitive",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VoteContractPrimitive__factory>;
+    getContractFactory(
+      name: "VotingStatusHandling",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VotingStatusHandling__factory>;
+    getContractFactory(
       name: "IVotingRegistry",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVotingRegistry__factory>;
@@ -227,6 +291,86 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.CanVoteAndImplement>;
+    getContractAt(
+      name: "CanVote",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CanVote>;
+    getContractAt(
+      name: "CanVotePrimitive",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CanVotePrimitive>;
+    getContractAt(
+      name: "CanVoteWithoutStarting",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CanVoteWithoutStarting>;
+    getContractAt(
+      name: "CanVoteAndDelegateImplement",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CanVoteAndDelegateImplement>;
+    getContractAt(
+      name: "CanVoteAndImplement",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CanVoteAndImplement>;
+    getContractAt(
+      name: "IVotingRegistry",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVotingRegistry>;
+    getContractAt(
+      name: "CategoryRegistration",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CategoryRegistration>;
+    getContractAt(
+      name: "Registry",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Registry>;
+    getContractAt(
+      name: "VotingContractRegistration",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VotingContractRegistration>;
+    getContractAt(
+      name: "IVoteAndImplementContract",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVoteAndImplementContract>;
+    getContractAt(
+      name: "IVoteContract",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVoteContract>;
+    getContractAt(
+      name: "RegisterVoteContract",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.RegisterVoteContract>;
+    getContractAt(
+      name: "VoteAndImplementContract",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VoteAndImplementContract>;
+    getContractAt(
+      name: "VoteContract",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VoteContract>;
+    getContractAt(
+      name: "VoteContractPrimitive",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VoteContractPrimitive>;
+    getContractAt(
+      name: "VotingStatusHandling",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VotingStatusHandling>;
     getContractAt(
       name: "IVotingRegistry",
       address: string,

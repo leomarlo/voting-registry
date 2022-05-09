@@ -1,0 +1,137 @@
+{
+    "methods": {
+        "getCallbackData(uint256)": {
+            "stateMutability": "view",
+            "code": "function getCallbackData(uint256 voteIndex) external view returns (bytes4 selector, bytes arguments)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "selector": {
+                    "type": "bytes4"
+                },
+                "arguments": {
+                    "type": "bytes"
+                }
+            }
+        },
+        "getCallbackResponse(uint256)": {
+            "stateMutability": "view",
+            "code": "function getCallbackResponse(uint256 voteIndex) external view returns (uint8)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint8"
+                }
+            }
+        },
+        "result(uint256)": {
+            "stateMutability": "view",
+            "code": "function result(uint256 voteIndex) external view returns (bytes32 votingResult)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "votingResult": {
+                    "type": "bytes32"
+                }
+            },
+            "notice": "The result can be the casted version of an address, an integer or a pointer to a mapping that contains the entire result."
+        },
+        "start(bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function start(bytes votingParams) external nonpayable returns (uint256 voteIndex)",
+            "inputs": {
+                "votingParams": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "start(bytes,bytes4,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function start(bytes votingParams, bytes4 _callbackSelector, bytes _callbackArgs) external nonpayable returns (uint256 index)",
+            "inputs": {
+                "votingParams": {
+                    "type": "bytes"
+                },
+                "_callbackSelector": {
+                    "type": "bytes4"
+                },
+                "_callbackArgs": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "index": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "statusPermitsVoting(uint256)": {
+            "stateMutability": "view",
+            "code": "function statusPermitsVoting(uint256 voteIndex) external view returns (bool)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "supportsInterface(bytes4)": {
+            "stateMutability": "view",
+            "code": "function supportsInterface(bytes4 interfaceId) external view returns (bool)",
+            "inputs": {
+                "interfaceId": {
+                    "type": "bytes4"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "details": "Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas."
+        },
+        "vote(uint256,address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function vote(uint256 voteIndex, address voter, uint256 option) external nonpayable returns (uint256 status)",
+            "inputs": {
+                "voteIndex": {
+                    "type": "uint256"
+                },
+                "voter": {
+                    "type": "address"
+                },
+                "option": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "status": {
+                    "type": "uint256"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/registration/voteContract",
+    "name": "IVoteAndImplementContract"
+}
