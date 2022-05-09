@@ -15,6 +15,11 @@ The whole setup consists of
 ![votingRegistry](img/votingRegistry.drawio.png)
 
 
+## Developer
+
+```sh
+git submodule update --init --recursive
+```
 
 ## Some useful Hardhat commands
 Try running some of the following tasks:
