@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
-import {VoteContract, VotingStatus} from "../voteContract/VoteContract.sol";
+import {VoteContract, VotingStatus} from "../voting-registry-contracts/voteContract/VoteContract.sol";
 
 error AlreadyVoted(address voter); // TODO: add more fields
 error VotingNotAllowed(uint256 voteIndex, address callingContract);

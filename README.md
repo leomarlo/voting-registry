@@ -24,7 +24,7 @@ git submodule update --init --recursive
 
 Every other time it suffices to run:
 ```sh
-git submodule update --recursive --remote
+git pull --recurse-submodules
 ```
 
 ## Some useful Hardhat commands

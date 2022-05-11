@@ -1,9 +1,9 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
-import {REGISTRY} from "../registry/RegistryAddress.sol";
-import {IVotingRegistry} from "../registry/IVotingRegistry.sol";
-import {CanVoteAndDelegateImplement} from "../integration/CanVoteAndDelegateImplement.sol";
+import {REGISTRY} from "../voting-registry-contracts/registry/RegistryAddress.sol";
+import {IVotingRegistry} from "../voting-registry-contracts/registry/IVotingRegistry.sol";
+import {CanVoteAndDelegateImplement} from "../voting-registry-contracts/integration/CanVoteAndDelegateImplement.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IDummyERC20, DummyERC20} from "./DummyERC20.sol";
 
